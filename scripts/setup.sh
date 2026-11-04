@@ -43,3 +43,4 @@ if [[ ! -x tools/spike/bin/spike ]]; then
 fi
 fetch https://huggingface.co/litert-community/MobileNet-v3-large/resolve/9a4fd87358f71befb4de2f5ecdce1a159486b1f2/mobilenet_v3_large_int8_channelwise.tflite models/mobilenet_v3_large_int8_channelwise.tflite 13993dec4dcfdf95d6f671b40e907b6fd6f04897577d23f4f407418fbf73bf48
 python3 scripts/export_model.py
+bash scripts/build_spike_custom.sh

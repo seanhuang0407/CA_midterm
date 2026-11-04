@@ -1,0 +1,17 @@
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x00000000800001dc (0x019a038b) xqmac8  t2, s4, s9
+core   0: 0x0000000080000270 (0x01d3938b) xrequant8 t2, t2, t4

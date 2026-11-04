@@ -1,0 +1,11 @@
+ROI expand instret=13582085
+ROI depthwise instret=39315305
+ROI project instret=10420995
+ROI residual instret=6961462
+ROI fc instret=2023758
+expand mismatches=0 checksum=913928010
+depthwise mismatches=0 checksum=3138770796
+project mismatches=0 checksum=2871611823
+residual mismatches=0 checksum=287239902
+fc mismatches=0 checksum=944833636
+PASS

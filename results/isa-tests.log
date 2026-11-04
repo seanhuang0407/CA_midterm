@@ -1,0 +1,20 @@
+bash scripts/build_spike_custom.sh
+/home/sean/CA_midterm/tools/spike-v1.1.0.tar.gz: OK
+Custom Spike is up to date.
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/platform.c tests/isa_test.c tests/isa_alias.S tests/trap.S -lgcc -o build/isa-test.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/isa-test.elf has a LOAD segment with RWX permissions
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/platform.c tests/reject_test.c tests/trap.S -lgcc -o build/reject-test.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/reject-test.elf has a LOAD segment with RWX permissions
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=1 -DUSE_QMAC=1 -DUSE_REQUANT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/platform.c tests/kernel_test.c src/kernels_opt.c -lgcc -o build/kernel-test.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/kernel-test.elf has a LOAD segment with RWX permissions
+riscv-none-elf-gcc -march=rv32imc_zicsr -mabi=ilp32 -nostdlib -nostartfiles -Wl,-T,src/link.ld tests/rv32_reject.S -o build/rv32-reject.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/rv32-reject.elf has a LOAD segment with RWX permissions
+bash scripts/test_isa.sh
+Xqmac8 vectors=10216 Xrequant8 vectors=10576
+assertions=155800 expected_illegal_traps=13
+PASS
+Kernel tail/alignment comparisons=19008
+PASS
+Stock Spike rejected both custom instructions
+PASS
+RV32 rejected both RV64-only custom instructions: PASS

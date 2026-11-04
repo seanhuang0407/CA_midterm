@@ -1,10 +1,12 @@
-# CA Midterm：MobileNetV3 整數 workload 與 Spike profiling
+# CA Midterm：MobileNetV3 整數 workload 與自訂 RISC-V ISA
 
-已完成工作 1、2 的 **dominant kernels + complete CNN block** 路線；工作 3 提供 ISA 設計提案，尚未加入 custom instructions。依期中要求不評估 PPA/CV-Wally，不將 Spike 指令數宣稱為 cycles。
+已完成 bare-metal baseline、Spike profiling、`Xqmac8`／`Xrequant8` 實作與新增指令驗證。評估範圍是 **主要 kernels＋完整 residual block＋FC**；不做 CV-Wally/PPA，不將指令數當作 cycles。
 
-## 如何執行
+Repository：[seanhuang0407/CA_midterm](https://github.com/seanhuang0407/CA_midterm)（private）。
 
-目前環境的工具已安裝於專案內：
+## 執行方式
+
+目前環境已備妥工具：
 
 ```bash
 cd /home/sean/CA_midterm
@@ -12,94 +14,101 @@ source scripts/env.sh
 bash scripts/run_all.sh
 ```
 
-此流程重新匯出模型、執行 C/Python 正確性測試、編譯 bare-metal ELF、用 Spike 執行 B0/B1/microbenchmark，最後產生 `results/SUMMARY.md` 與 JSON。成功時各層顯示 `mismatches=0`，三個 Spike 測試均為 `PASS`。
+會匯出原模型、跑 host tests、建置 custom Spike、跑新增指令測試、編譯並評估所有版本。各層應為 `mismatches=0`，所有測試為 `PASS`；輸出寫入 results/。
 
-新環境需有 bash、curl、tar、sha256sum、dpkg-deb、make、GCC/G++ 與 Python 3.8，先執行：
+新環境先準備 bash、curl、tar、sha256sum、cut、cat、cp、patch、timeout、dpkg-deb、make、GCC/G++、Python 3.8，再執行：
 
 ```bash
+git clone https://github.com/seanhuang0407/CA_midterm.git
+cd CA_midterm
 bash scripts/setup.sh
 source scripts/env.sh
 bash scripts/run_all.sh
 ```
 
-支援條件：Ubuntu 20.04 x86_64／Python 3.8.2；其他平台未驗證。setup 下載固定版本並核對 GCC/Spike/model/DEB 的 SHA256，僅安裝到 tools/，不需 sudo。GCC 下載約 414 MB；不要將 tools/ 放入 GitHub。
+驗證平台為 Ubuntu 20.04 x86_64／Python 3.8.2。setup 下載固定版本及驗證 hash；GCC 約 414 MB，工具僅裝在 tools/，不需 sudo。其他平台／Python wheel 未驗證。
 
-可分步執行：
+分步執行：
 
 ```bash
 source scripts/env.sh
-make export                  # 原模型 → C 靜態資料與 Python/reference 驗證
-make test                    # C B0/B1 + 10,144 組 qmul 邊界/隨機案例與分類器測試
-make all                     # B0.elf、B1.elf、micro.elf 與反組譯/symbols
-make benchmark               # Spike 量測與解析
-python3 scripts/summarize.py # 更新 Markdown 總表
+make export                  # 真實 pretrained weights → C 靜態資料／整數 reference
+make test                    # Host C、rounding 與 prepared quantization 驗證
+make isa-test                # 建置 custom Spike + 指令／tail／非法指令測試
+make all                     # 所有 workload、microbenchmark ELF 與反組譯
+make benchmark               # Spike 精確 PC histogram + minstret ROI
+python3 scripts/summarize.py # 自動產生結果總表
 ```
 
-單獨量測 B0：
+原版 `spike` 執行純軟體組態；修改版路徑是 `tools/spike-xq/bin/spike`：
 
 ```bash
-spike --isa=RV64IMC -g build/B0.elf > results/B0.stdout 2> results/B0.histogram
-python3 scripts/profile.py --variant B0
+tools/spike-xq/bin/spike --isa=RV64IMC -g build/X2.elf > results/X2.stdout 2> results/X2.histogram
+python3 scripts/profile.py --variant X2
 ```
 
-使用 GCC 15.2.0、Spike v1.1.0（commit `530af85d83781a3dae31a4ace84a573ec255fefa`）。Spike 只編譯 IMC + privileged handlers。編譯旗標 `-O2 -march=rv64imc_zicsr -mabi=lp64`，Zicsr 用於 M-mode minstret；不啟用 F/D/V。ELF entry 為 0x80000000，startup 設定 stack/gp、清空 BSS，HTIF 負責列印與結束。不使用 Linux、pk、malloc 或浮點 runtime。
+GCC 15.2.0、Spike v1.1.0 commit `530af85d83781a3dae31a4ace84a573ec255fefa`。編譯使用 `-O2 -march=rv64imc_zicsr -mabi=lp64`，Zicsr 只用於 M-mode counters/control；不啟用 F/D/V。ELF entry=0x80000000，HTIF 列印／結束；不使用 Linux、pk、malloc 或浮點 runtime。
 
-## 模型內容與實作範圍
+## 模型內容
 
-上游 [LiteRT MobileNet-v3-large](https://huggingface.co/litert-community/MobileNet-v3-large)，revision `9a4fd87358f71befb4de2f5ecdce1a159486b1f2`；輸入 [1,3,224,224]、輸出 1000 類。卷積與 FC 權重共 **5,451,272** 個元素（不含 bias），約 **216.59M MAC/inference**，符合題目規模。詳見 [模型說明](docs/MODEL.md) 與 [manifest](models/manifest.json)。
+上游 [LiteRT MobileNet-v3-large](https://huggingface.co/litert-community/MobileNet-v3-large)，固定 revision `9a4fd87358f71befb4de2f5ecdce1a159486b1f2`，卷積／FC 權重共 **5,451,272** 個元素，約 **216.59M MAC/inference**。來源與 hash 見 [manifest](models/manifest.json)，結構見 [MODEL.md](docs/MODEL.md)。
 
-本次移植原圖 ops 14–17 的完整整數 residual block：
+本次執行原圖 ops 14–17：
 
 ```text
 56×56×24 INT8
-  → 1×1 expand Conv (24→72) + ReLU
-  → 3×3 depthwise Conv + ReLU
-  → 1×1 project Conv (72→24)
-  → residual ADD（加回 block input）
-  → 56×56×24 INT8
+ → 1×1 Conv (24→72) + ReLU
+ → 3×3 depthwise Conv + ReLU
+ → 1×1 Conv (72→24)
+ → residual ADD（加回 block input）
+ → 56×56×24 INT8
 ```
 
-另測原模型第一個 FC（960→1280）與 128 MAC microbenchmark。權重與 activation INT8、bias/accumulator INT32、fixed-point multiply INT64；runtime buffer 靜態配置，量化 scales 由 Python 離線轉成整數 multiplier/shift。
+另含實際模型 FC（960→1280）及 128 MAC microbenchmark。block+FC 共 14,098,944 MAC，權重／activation INT8，bias／accumulator INT32，fixed-point multiply INT64，所有 buffer 靜態配置。
 
-原模型輸入端含浮點算子，因此**沒有完成整個模型的 bare-metal inference**。Python host 執行原圖並擷取真實中間 activation；RISC-V ELF 只跑上述整數範圍。使用 seed=2026 的隨機 INT8 輸入與真實 pretrained 權重驗證數值正確性，未測分類準確率。完整 block 為 12,870,144 MAC；block+FC 為 14,098,944 MAC。
+原圖輸入端含浮點算子，Python host 先擷取真實中間 activation，RISC-V 僅執行上述整數範圍；**尚非完整模型 bare-metal inference**。使用固定 seed=2026 隨機輸入驗證數值，未測 ImageNet accuracy。
 
-## 實測結果與預期輸出
+## 已實作的兩條指令
 
-詳見 [結果總表](results/SUMMARY.md)、[B0 輸出](results/B0.stdout)、[B1 輸出](results/B1.stdout) 及各自 JSON/histogram。
+- **Xqmac8**：兩個 packed 64-bit operands，各 8 個 signed INT8 lane，讀寫 rd 的 INT32 accumulator；32-bit modular overflow，結果 sign-extend。
+- **Xrequant8**：讀 INT32 accumulator 與 64-bit per-channel descriptor，合併 Q31 multiply、double rounding、right shift、zero-point、clamp。非法 descriptor 觸發 illegal instruction。
 
-| 算子 | B0 retired instructions | B1 retired instructions |
-|---|---:|---:|
-| Expand | 56,896,642 | 46,754,827 |
-| Depthwise | 49,213,055 | 49,213,055 |
-| Project | 47,981,278 | 36,484,711 |
-| Residual ADD | 8,767,869 | 8,767,869 |
-| FC | 9,907,914 | 7,154,649 |
-| **ROI 合計** | **172,766,758** | **148,375,111** |
+[ISA 規格與分析](docs/ISA_PROPOSAL.md) 說明 encoding、alias/x0、rounding、限制與增量實驗；[isa/README.md](isa/README.md) 說明 upstream patch 與可重建 source。選擇 custom simulator binary 才會執行新指令；GNU objdump 顯示 `.4byte`，profiling script 會直接解碼 instruction bits。
 
-B0/B1 均為 -O2，B1 對 pointwise/FC 做四路 scalar loop unrolling 與四個 accumulator。總指令減少 **14.12%**，指令數比 **1.1644×**，不是 cycle speedup 或完整模型加速比。目前尚未達到 ≥2× 指令減少門檻。
+## 實測結果
 
-所有層應顯示 `mismatches=0`；seed=2026 的 checksum：expand=2998823028、depthwise=4184350541、project=1727378119、residual=612828347、fc=1427406882。不同輸入／工具版本可能改變動態指令數。
+所有版本都對相同 reference 逐元素驗證；詳見 [SUMMARY.md](results/SUMMARY.md)。
 
-ROI 是算子前後 minstret 差值，包含少量呼叫／取樣開銷。Kernel histogram 僅計 pointwise、depthwise、residual、requant、qmul 函式內指令，排除驗證與列印；whole-program 包含全部測試開銷。三種範圍不可混用。Spike 不提供這個 workload 的 cache miss、stall、CPI 或 CV-Wally cycles。
+| 組態 | 行為 | block+FC retired instructions |
+|---|---|---:|
+| B0 | 原始 baseline | 172,766,758 |
+| B1 | scalar unroll | 148,375,111 |
+| S | folded bias、scalar unroll、inline requant | 132,932,061 |
+| P | packed load + scalar unpack/MAC 控制組 | 198,993,870 |
+| X1 | P + Xqmac8 | 92,779,463 |
+| XR | P + Xrequant8 消融組 | 178,543,138 |
+| X2 | P + 兩條自訂指令 | **72,303,636** |
 
-## 瓶頸與第 3 項提案
+X2 相對 B0 約 **2.389× 指令數縮減（減少 58.15%）**；相對最快純軟體 S 約 **1.839×**。Expand/project/FC 相對最快純軟體各約 **3.01×／2.95×／2.93×**，達成題目 major GEMM/FC ≥2× dynamic instruction reduction 目標。這些都不是 cycle speedup 或完整模型加速比。
 
-- Scalar MAC：14,098,944 MAC 仍逐項 multiply/add，另有 zero-point／迴圈操作。
-- Load/store 與迴圈：B0 kernel 約 36.85M memory instructions，約 2.6134 memory instructions/MAC；展開沒有減少 byte loads。
-- Requantization：qmul+requant 約 29.89M 指令，含目前 noinline 呼叫／stack 開銷；必須補 inline 軟體比較後再解讀 ISA 效益。
+P 的 unpack 指令成本使它比 S 慢，因此報告同時提供 S 比較；不能只用較慢的 P 宣稱效益。X2 執行 1,508,352 次 Xqmac8、528,128 次 Xrequant8。最佳化後 depthwise 占約 54.4% ROI，是下一個主要瓶頸。
 
-[ISA_PROPOSAL.md](docs/ISA_PROPOSAL.md) 已提出 `Xqmac8`（8 組 signed INT8 MAC）與 `Xrequant8`（per-channel 整數 rescaling/clamp）的 encoding、rounding、overflow、zero-point folding 與驗證計畫。優先加速 pointwise/FC；depthwise 的 gather／邊界處理獨立量測。custom 指令尚未實作，不能報告其加速比。
+預期 seed=2026 所有層為 `mismatches=0`；checksum：expand=2998823028、depthwise=4184350541、project=1727378119、residual=612828347、fc=1427406882。工具版本／輸入改變時指令數可能改變。
 
-## 檔案與期中繳交狀態
+ROI 為算子前後 minstret 差值，含少量呼叫／取樣；kernel histogram 排除驗證／列印；whole-program 包含全部開銷。資料範圍不可混用。沒有測 cache misses、bandwidth、CPI、Fmax 或 PPA。
 
-| 繳交項目 | 狀態／檔案 |
+## 驗證與繳交狀態
+
+指令測試有 10,216 組 MAC、10,576 組 requant vectors，共 155,800 項斷言；另有 19,008 項 kernel tail／alignment 比對。涵蓋 alias、x0、wrap、sign extension、負數 rounding、非法 descriptor、原版 Spike 拒絕 custom、RV32 拒絕 RV64-only 指令。詳細證據見 [VERIFICATION.md](results/VERIFICATION.md)。
+
+| 期中繳交項目 | 狀態／位置 |
 |---|---|
-| C/C++ bare-metal workload | 完成目前 block/FC 範圍：src/kernels.c、start.S、link.ld、platform.c |
-| Quantized model / Python conversion | scripts/export_model.py、models/manifest.json；setup 下載固定模型 |
-| Spike/custom ISA source | 上游 Spike 建置完成；新增指令尚未實作，本次提供設計提案 |
-| Added-instruction tests | 待實作指令後完成；目前 tests/ 為 baseline/量化驗證 |
-| Reproducible workload benchmark | scripts/run_all.sh、benchmark.sh、profile.py；範圍為完整 block+FC |
+| C/C++ bare-metal workload | 完成目前 block/FC 範圍：src/ |
+| Quantized model / Python conversion | scripts/export_model.py、models/manifest.json、固定模型下載 |
+| Spike/custom ISA source | 完成：isa/spike/、isa/spike.patch、scripts/build_spike_custom.sh |
+| Added-instruction verification tests | 完成：tests/isa_test.c、isa_alias.S、gen_isa_vectors.py 等 |
+| Reproducible workload benchmarks | 完成目前 block+FC 範圍：scripts/run_all.sh／benchmark.sh／profile.py |
 | 5–6 分鐘 slides | 尚未製作 |
-| GitHub README / expected measurements | 本文件與 results/；遠端 repository 上傳狀態以 GitHub 為準 |
+| GitHub README / expected measurements | 本文件與 results/ |
 
-`tools/`、`build/`、模型二進位由 .gitignore 排除。GitHub 可提交原始碼、文件、manifest、結果，以 setup 重建模型與工具。上游權重遵守原始授權。AI 協作紀錄見 [AI_USAGE.md](AI_USAGE.md)。
+`tools/`、`build/`、模型二進位與 verbose build logs 不納入 Git。新指令源碼與 patch 都有追蹤；第三方原始碼由固定 hash 的 upstream tarball 重建。上游模型／Spike 依原始授權；AI 協作見 [AI_USAGE.md](AI_USAGE.md)。

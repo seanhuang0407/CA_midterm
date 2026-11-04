@@ -1,0 +1,3 @@
+Xqmac8 vectors=10216 Xrequant8 vectors=10576
+assertions=155800 expected_illegal_traps=13
+PASS

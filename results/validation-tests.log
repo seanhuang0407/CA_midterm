@@ -1,0 +1,47 @@
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -DHOST -DOPT=0 src/main.c src/kernels.c src/platform.c -o build/host-B0
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -DHOST -DOPT=1 src/main.c src/kernels.c src/platform.c -o build/host-B1
+./build/host-B0
+ROI expand instret=0
+ROI depthwise instret=0
+ROI project instret=0
+ROI residual instret=0
+ROI fc instret=0
+expand mismatches=0 checksum=2998823028
+depthwise mismatches=0 checksum=4184350541
+project mismatches=0 checksum=1727378119
+residual mismatches=0 checksum=612828347
+fc mismatches=0 checksum=1427406882
+PASS
+./build/host-B1
+ROI expand instret=0
+ROI depthwise instret=0
+ROI project instret=0
+ROI residual instret=0
+ROI fc instret=0
+expand mismatches=0 checksum=2998823028
+depthwise mismatches=0 checksum=4184350541
+project mismatches=0 checksum=1727378119
+residual mismatches=0 checksum=612828347
+fc mismatches=0 checksum=1427406882
+PASS
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -fPIC -shared tests/quant_export.c -o build/libquant-opt.so
+python3 tests/test_quant.py
+...
+----------------------------------------------------------------------
+Ran 3 tests in 0.143s
+
+OK
+bash scripts/build_spike_custom.sh
+/home/sean/CA_midterm/tools/spike-v1.1.0.tar.gz: OK
+Custom Spike is up to date.
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=1 -DUSE_QMAC=1 -DUSE_REQUANT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S tests/kernel_test.c src/kernels_opt.c src/platform.c -lgcc -o build/kernel-test.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/kernel-test.elf has a LOAD segment with RWX permissions
+bash scripts/test_isa.sh
+Xqmac8 vectors=10216 Xrequant8 vectors=10576
+assertions=155793 expected_illegal_traps=13
+PASS
+Kernel tail/alignment comparisons=19008
+PASS
+Stock Spike rejected both custom instructions
+PASS
+RV32 rejected both RV64-only custom instructions: PASS

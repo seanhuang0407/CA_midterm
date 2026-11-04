@@ -1,3 +1,6 @@
+bash scripts/build_spike_custom.sh
+/home/sean/CA_midterm/tools/spike-v1.1.0.tar.gz: OK
+Custom Spike is up to date.
 bash scripts/benchmark.sh
 {
   "variant": "B0",
@@ -103,8 +106,20 @@ bash scripts/benchmark.sh
   "kernel_memory_instructions": 36846169,
   "kernel_load_store_per_MAC": 2.6133992020962706,
   "disassembled_text_bytes": 2042,
-  "custom_instruction_frequency": 0,
-  "functional_pass": true
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 251.98697030895693,
+    "depthwise": 217.9574785643424,
+    "project": 637.5063509778912,
+    "residual": 116.49485809948979,
+    "fc": 7740.5578125
+  }
 }
 {
   "variant": "B1",
@@ -211,8 +226,614 @@ bash scripts/benchmark.sh
   "kernel_memory_instructions": 36871267,
   "kernel_load_store_per_MAC": 2.6151793354168937,
   "disassembled_text_bytes": 2198,
-  "custom_instruction_frequency": 0,
-  "functional_pass": true
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 207.07034350198413,
+    "depthwise": 217.9574785643424,
+    "project": 484.7564705569728,
+    "residual": 116.49485809948979,
+    "fc": 5589.56953125
+  }
+}
+{
+  "variant": "S",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 141345020,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 74493505,
+    "branch_jump": 16251587,
+    "store": 1767918,
+    "load": 33375532,
+    "multiply": 15456348,
+    "system": 124
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 15365851,
+    "integer_ALU": 68984530,
+    "store": 1691234,
+    "load": 32037502,
+    "multiply": 14852864
+  },
+  "kernel_mnemonics": {
+    "bge": 1921541,
+    "c.mv": 3192044,
+    "c.addi16sp": 8,
+    "c.sdsp": 1087842,
+    "slli": 6,
+    "addiw": 3015039,
+    "c.li": 1637036,
+    "c.add": 2187779,
+    "andi": 3696899,
+    "blt": 904420,
+    "srliw": 829187,
+    "lui": 1162215,
+    "c.addi": 8446981,
+    "addi": 2866393,
+    "xori": 5,
+    "c.ldsp": 2003550,
+    "add": 2929923,
+    "lw": 1130240,
+    "lb": 28300320,
+    "mulw": 14098944,
+    "addw": 17659770,
+    "bne": 6339065,
+    "ld": 528128,
+    "srli": 1810176,
+    "subw": 829184,
+    "and": 1658368,
+    "c.addiw": 5284922,
+    "c.beqz": 907008,
+    "c.srli": 302336,
+    "mul": 753920,
+    "srai": 829184,
+    "c.and": 302336,
+    "c.srai": 678656,
+    "beq": 5245568,
+    "sllw": 678656,
+    "sraw": 678656,
+    "slt": 1206784,
+    "sb": 603392,
+    "c.jr": 5,
+    "c.j": 48244,
+    "c.slli": 1,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.andi": 2032128,
+    "c.subw": 1984032,
+    "slliw": 150528,
+    "sll": 225792,
+    "c.lw": 75264
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 77492725,
+    "depthwise_prepared": 48477776,
+    "residual": 6961480,
+    "text": 264666,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 40835044,
+    "depthwise": 48477790,
+    "project": 30737021,
+    "residual": 6961493,
+    "fc": 5920713
+  },
+  "operator_share": {
+    "expand": 0.30718732330494747,
+    "depthwise": 0.3646809478113786,
+    "project": 0.23122353455424122,
+    "residual": 0.052368803640229424,
+    "fc": 0.04453939068920326
+  },
+  "ROI_retired": 132932061,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.10606127591747788,
+  "kernel_memory_instructions": 33728736,
+  "kernel_load_store_per_MAC": 2.3922881032792245,
+  "disassembled_text_bytes": 2542,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 180.85248370181407,
+    "depthwise": 214.7010965844671,
+    "project": 408.38941592261904,
+    "residual": 92.49432663690476,
+    "fc": 4625.55703125
+  }
+}
+{
+  "variant": "P",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 207410021,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 159861576,
+    "branch_jump": 18063856,
+    "store": 1767920,
+    "load": 12260190,
+    "multiply": 15456349,
+    "system": 124
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 17176533,
+    "integer_ALU": 154352585,
+    "store": 1691234,
+    "load": 10920574,
+    "multiply": 14852864
+  },
+  "kernel_mnemonics": {
+    "bge": 1921541,
+    "c.addi16sp": 8,
+    "c.sdsp": 1087842,
+    "c.mv": 3494374,
+    "addiw": 27148671,
+    "srliw": 3845891,
+    "slli": 6,
+    "c.addi": 5430277,
+    "lui": 1162215,
+    "c.andi": 2032131,
+    "addi": 2866396,
+    "c.add": 2187779,
+    "xori": 24133637,
+    "c.li": 427686,
+    "c.ldsp": 2003550,
+    "add": 2929923,
+    "lw": 1130240,
+    "c.j": 350577,
+    "andi": 24813824,
+    "ld": 3544832,
+    "bne": 4830713,
+    "mulw": 14098944,
+    "srli": 18704384,
+    "addw": 13433722,
+    "c.addw": 3016704,
+    "c.srli": 1508352,
+    "beq": 9169280,
+    "subw": 829184,
+    "and": 1960704,
+    "c.addiw": 5284922,
+    "mul": 753920,
+    "blt": 904417,
+    "srai": 829184,
+    "c.srai": 678656,
+    "sllw": 678656,
+    "sraw": 678656,
+    "slt": 1206784,
+    "sb": 603392,
+    "c.jr": 5,
+    "c.slli": 1,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "slliw": 150528,
+    "sll": 225792,
+    "c.lw": 75264
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 143554534,
+    "depthwise_prepared": 48477776,
+    "residual": 6961480,
+    "text": 267838,
+    "finish": 4,
+    "number": 2130
+  },
+  "operator_instret": {
+    "expand": 69962207,
+    "depthwise": 48477790,
+    "project": 60767352,
+    "residual": 6961493,
+    "fc": 12825028
+  },
+  "operator_share": {
+    "expand": 0.3515797094654222,
+    "depthwise": 0.24361448923024615,
+    "project": 0.3053729846050032,
+    "residual": 0.03498345451545819,
+    "fc": 0.06444936218387029
+  },
+  "ROI_retired": 198993870,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.07085114732428692,
+  "kernel_memory_instructions": 12611808,
+  "kernel_load_store_per_MAC": 0.8945214620329012,
+  "disassembled_text_bytes": 2832,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 309.8524615575397,
+    "depthwise": 214.7010965844671,
+    "project": 807.3893494897959,
+    "residual": 92.49432663690476,
+    "fc": 10019.553125
+  }
+}
+{
+  "variant": "X1",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 101195020,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 64810289,
+    "branch_jump": 18063568,
+    "store": 1465582,
+    "load": 11957567,
+    "multiply": 3389532,
+    "system": 124,
+    "custom_mac": 1508352
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 17176533,
+    "integer_ALU": 59301314,
+    "store": 1388898,
+    "load": 10618238,
+    "custom_mac": 1508352,
+    "multiply": 2786048
+  },
+  "kernel_mnemonics": {
+    "bge": 1921541,
+    "c.addi16sp": 8,
+    "c.sdsp": 785506,
+    "c.mv": 3469279,
+    "addiw": 3015036,
+    "srliw": 829187,
+    "slli": 3,
+    "andi": 6713603,
+    "lui": 1162215,
+    "c.slli": 1508356,
+    "c.addi": 5430277,
+    "addi": 2866396,
+    "c.addiw": 6793277,
+    "c.add": 1885443,
+    "xori": 5,
+    "c.li": 427686,
+    "c.ldsp": 1701214,
+    "add": 3232259,
+    "lw": 1130240,
+    "c.j": 350577,
+    "ld": 3544832,
+    "c.bnez": 1508352,
+    "srli": 3620864,
+    "xqmac8": 1508352,
+    "beq": 7660928,
+    "c.beqz": 1508352,
+    "subw": 829184,
+    "and": 1658368,
+    "mul": 753920,
+    "blt": 904417,
+    "srai": 829184,
+    "c.and": 302336,
+    "c.srai": 678656,
+    "sllw": 678656,
+    "sraw": 678656,
+    "slt": 1206784,
+    "addw": 4383610,
+    "sb": 603392,
+    "bne": 3322361,
+    "c.jr": 5,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.andi": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "mulw": 2032128,
+    "slliw": 150528,
+    "sll": 225792,
+    "c.lw": 75264
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 37340127,
+    "depthwise_prepared": 48477776,
+    "residual": 6961480,
+    "text": 267264,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 22081758,
+    "depthwise": 48477790,
+    "project": 13187959,
+    "residual": 6961493,
+    "fc": 2070463
+  },
+  "operator_share": {
+    "expand": 0.2380026493578649,
+    "depthwise": 0.5225056109669443,
+    "project": 0.14214308397107234,
+    "residual": 0.07503269338819088,
+    "fc": 0.02231596231592761
+  },
+  "ROI_retired": 92779463,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.15196190562129036,
+  "kernel_memory_instructions": 12007136,
+  "kernel_load_store_per_MAC": 0.8516337110070088,
+  "disassembled_text_bytes": 2552,
+  "custom_instruction_frequency": 0.01625740494523444,
+  "custom_instruction_counts": {
+    "xqmac8": 1508352,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.8558666521407561,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 97.79690157312925,
+    "depthwise": 214.7010965844671,
+    "project": 175.22266953656464,
+    "residual": 92.49432663690476,
+    "fc": 1617.54921875
+  }
+}
+{
+  "variant": "XR",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 186955021,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 141532297,
+    "branch_jump": 14555659,
+    "store": 2579391,
+    "load": 12831195,
+    "multiply": 14928221,
+    "system": 124,
+    "custom_requant": 528128
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 13670470,
+    "integer_ALU": 136023306,
+    "store": 2502705,
+    "load": 11493713,
+    "multiply": 14324736,
+    "custom_requant": 528128
+  },
+  "kernel_mnemonics": {
+    "bge": 1056263,
+    "c.addi16sp": 8,
+    "c.sdsp": 1899313,
+    "c.mv": 3343802,
+    "addiw": 26178368,
+    "srliw": 3317763,
+    "slli": 3,
+    "c.addi": 4902149,
+    "c.andi": 2032131,
+    "c.slli": 4,
+    "c.add": 829187,
+    "c.li": 427682,
+    "addi": 2863257,
+    "add": 2704131,
+    "lw": 1130240,
+    "c.j": 350432,
+    "andi": 21116928,
+    "ld": 3544832,
+    "bne": 4830713,
+    "xori": 24133633,
+    "mulw": 14098944,
+    "srli": 15083520,
+    "addw": 15394170,
+    "c.srli": 3016704,
+    "beq": 5024640,
+    "c.ldsp": 2576689,
+    "xrequant8": 528128,
+    "sb": 603392,
+    "c.jr": 5,
+    "c.lui": 2,
+    "c.addiw": 3691129,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.beqz": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "lui": 338335,
+    "subw": 301056,
+    "slliw": 150528,
+    "sll": 225792,
+    "mul": 225792,
+    "blt": 376289,
+    "srai": 301056,
+    "and": 376320,
+    "c.lw": 75264,
+    "c.srai": 150528,
+    "sllw": 150528,
+    "sraw": 150528,
+    "slt": 150528
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 132266287,
+    "depthwise_prepared": 39315291,
+    "residual": 6961480,
+    "text": 263570,
+    "finish": 4,
+    "number": 2130
+  },
+  "operator_instret": {
+    "expand": 61475079,
+    "depthwise": 39315305,
+    "project": 58012933,
+    "residual": 6961493,
+    "fc": 12778328
+  },
+  "operator_share": {
+    "expand": 0.3443149912599833,
+    "depthwise": 0.22020059376350828,
+    "project": 0.324923901583941,
+    "residual": 0.03899053796175578,
+    "fc": 0.07156997543081157
+  },
+  "ROI_retired": 178543138,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.07896659685683356,
+  "kernel_memory_instructions": 13996418,
+  "kernel_load_store_per_MAC": 0.9927281078639648,
+  "disassembled_text_bytes": 2468,
+  "custom_instruction_frequency": 0.0029579867507366206,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 528128
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 272.26420333758506,
+    "depthwise": 174.12178022250566,
+    "project": 770.7925834396259,
+    "residual": 92.49432663690476,
+    "fc": 9983.06875
+  }
+}
+{
+  "variant": "X2",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 80720021,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 46455915,
+    "branch_jump": 14557919,
+    "store": 2277053,
+    "load": 12531120,
+    "multiply": 2861404,
+    "system": 124,
+    "custom_mac": 1508352,
+    "custom_requant": 528128
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 13670470,
+    "integer_ALU": 40946940,
+    "store": 2200369,
+    "load": 11191377,
+    "custom_mac": 1508352,
+    "custom_requant": 528128,
+    "multiply": 2257920
+  },
+  "kernel_mnemonics": {
+    "bge": 1056263,
+    "c.addi16sp": 8,
+    "c.sdsp": 1596977,
+    "c.mv": 3293612,
+    "addiw": 2038463,
+    "srliw": 301059,
+    "slli": 6,
+    "c.andi": 2032131,
+    "c.addi": 4902149,
+    "c.add": 829187,
+    "c.li": 427682,
+    "addi": 2863257,
+    "add": 2704131,
+    "lw": 1130240,
+    "c.j": 350432,
+    "andi": 3016704,
+    "ld": 3544832,
+    "c.bnez": 1508352,
+    "c.slli": 1508353,
+    "srli": 1508352,
+    "xqmac8": 1508352,
+    "c.addiw": 5205754,
+    "beq": 3516288,
+    "c.beqz": 3540480,
+    "c.ldsp": 2274353,
+    "xrequant8": 528128,
+    "sb": 603392,
+    "bne": 3322361,
+    "addw": 3327354,
+    "c.jr": 5,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "mulw": 2032128,
+    "lui": 338335,
+    "xori": 1,
+    "subw": 301056,
+    "slliw": 150528,
+    "sll": 225792,
+    "mul": 225792,
+    "blt": 376289,
+    "srai": 301056,
+    "and": 376320,
+    "c.lw": 75264,
+    "c.srai": 150528,
+    "sllw": 150528,
+    "sraw": 150528,
+    "slt": 150528
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 26026785,
+    "depthwise_prepared": 39315291,
+    "residual": 6961480,
+    "text": 268092,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 13582085,
+    "depthwise": 39315305,
+    "project": 10420995,
+    "residual": 6961493,
+    "fc": 2023758
+  },
+  "operator_share": {
+    "expand": 0.1878478836112751,
+    "depthwise": 0.5437528065670169,
+    "project": 0.14412822890400698,
+    "residual": 0.0962813682011787,
+    "fc": 0.027989712716522307
+  },
+  "ROI_retired": 72303636,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.19499633462416746,
+  "kernel_memory_instructions": 13391746,
+  "kernel_load_store_per_MAC": 0.9498403568380724,
+  "disassembled_text_bytes": 2176,
+  "custom_instruction_frequency": 0.0281656963040656,
+  "custom_instruction_counts": {
+    "xqmac8": 1508352,
+    "xrequant8": 528128
+  },
+  "custom_MAC_coverage": 0.8558666521407561,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 60.15308336876417,
+    "depthwise": 174.12178022250566,
+    "project": 138.45922353316325,
+    "residual": 92.49432663690476,
+    "fc": 1581.0609375
+  }
 }
 {
   "variant": "micro",
@@ -296,6 +917,464 @@ bash scripts/benchmark.sh
   "kernel_memory_instructions": 318,
   "kernel_load_store_per_MAC": 2.484375,
   "disassembled_text_bytes": 1450,
-  "custom_instruction_frequency": 0,
-  "functional_pass": true
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 1182.0
+  }
+}
+{
+  "variant": "micro-S",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 20017,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 3203,
+    "branch_jump": 7998,
+    "store": 395,
+    "multiply": 388,
+    "system": 12,
+    "load": 8015
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 48,
+    "integer_ALU": 285,
+    "store": 20,
+    "load": 277,
+    "multiply": 129
+  },
+  "kernel_mnemonics": {
+    "bge": 6,
+    "c.mv": 20,
+    "c.addi16sp": 2,
+    "c.sdsp": 19,
+    "slli": 2,
+    "addiw": 4,
+    "c.li": 11,
+    "c.add": 5,
+    "andi": 8,
+    "blt": 2,
+    "srliw": 2,
+    "lui": 3,
+    "c.addi": 69,
+    "addi": 1,
+    "xori": 1,
+    "c.ldsp": 19,
+    "add": 3,
+    "lw": 1,
+    "lb": 256,
+    "mulw": 128,
+    "addw": 136,
+    "bne": 34,
+    "ld": 1,
+    "srli": 3,
+    "subw": 1,
+    "and": 2,
+    "c.addiw": 4,
+    "c.beqz": 3,
+    "c.srli": 1,
+    "mul": 1,
+    "srai": 1,
+    "c.and": 1,
+    "c.srai": 1,
+    "beq": 1,
+    "sllw": 1,
+    "sraw": 1,
+    "slt": 2,
+    "sb": 1,
+    "c.jr": 1,
+    "c.j": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 759,
+    "text": 15646,
+    "finish": 4,
+    "number": 78
+  },
+  "operator_instret": {
+    "micro": 770
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 770,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.16623376623376623,
+  "kernel_memory_instructions": 297,
+  "kernel_load_store_per_MAC": 2.3203125,
+  "disassembled_text_bytes": 2030,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 770.0
+  }
+}
+{
+  "variant": "micro-P",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 25016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 4137,
+    "branch_jump": 10149,
+    "store": 397,
+    "multiply": 389,
+    "system": 12,
+    "load": 9926
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 63,
+    "integer_ALU": 1203,
+    "store": 20,
+    "load": 53,
+    "multiply": 129
+  },
+  "kernel_mnemonics": {
+    "bge": 6,
+    "c.addi16sp": 2,
+    "c.sdsp": 19,
+    "c.mv": 19,
+    "addiw": 260,
+    "srliw": 34,
+    "slli": 2,
+    "c.addi": 37,
+    "lui": 3,
+    "c.andi": 1,
+    "addi": 2,
+    "c.add": 5,
+    "xori": 257,
+    "c.li": 5,
+    "c.ldsp": 19,
+    "add": 3,
+    "lw": 1,
+    "c.j": 1,
+    "andi": 231,
+    "ld": 33,
+    "bne": 18,
+    "mulw": 128,
+    "srli": 180,
+    "addw": 100,
+    "c.addw": 32,
+    "c.srli": 16,
+    "beq": 36,
+    "subw": 1,
+    "and": 3,
+    "c.addiw": 4,
+    "mul": 1,
+    "blt": 1,
+    "srai": 1,
+    "c.srai": 1,
+    "sllw": 1,
+    "sraw": 1,
+    "slt": 2,
+    "sb": 1,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 1468,
+    "text": 19916,
+    "finish": 4,
+    "number": 98
+  },
+  "operator_instret": {
+    "micro": 1479
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 1479,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.08654496281271129,
+  "kernel_memory_instructions": 73,
+  "kernel_load_store_per_MAC": 0.5703125,
+  "disassembled_text_bytes": 2320,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 1479.0
+  }
+}
+{
+  "variant": "micro-X1",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 20017,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 3108,
+    "branch_jump": 8222,
+    "store": 394,
+    "multiply": 260,
+    "system": 12,
+    "load": 7999,
+    "custom_mac": 16
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 63,
+    "integer_ALU": 190,
+    "store": 19,
+    "load": 52,
+    "custom_mac": 16,
+    "multiply": 1
+  },
+  "kernel_mnemonics": {
+    "bge": 6,
+    "c.addi16sp": 2,
+    "c.sdsp": 18,
+    "c.mv": 14,
+    "addiw": 3,
+    "srliw": 2,
+    "slli": 1,
+    "andi": 40,
+    "lui": 3,
+    "c.slli": 17,
+    "c.addi": 37,
+    "addi": 2,
+    "c.addiw": 21,
+    "c.add": 4,
+    "xori": 1,
+    "c.li": 5,
+    "c.ldsp": 18,
+    "add": 4,
+    "lw": 1,
+    "c.j": 1,
+    "ld": 33,
+    "c.bnez": 16,
+    "srli": 20,
+    "xqmac8": 16,
+    "beq": 20,
+    "c.beqz": 16,
+    "subw": 1,
+    "and": 2,
+    "mul": 1,
+    "blt": 1,
+    "srai": 1,
+    "c.and": 1,
+    "c.srai": 1,
+    "sllw": 1,
+    "sraw": 1,
+    "slt": 2,
+    "addw": 4,
+    "sb": 1,
+    "bne": 2,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 341,
+    "text": 16064,
+    "finish": 4,
+    "number": 78
+  },
+  "operator_instret": {
+    "micro": 352
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 352,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.36363636363636365,
+  "kernel_memory_instructions": 71,
+  "kernel_load_store_per_MAC": 0.5546875,
+  "disassembled_text_bytes": 2040,
+  "custom_instruction_frequency": 0.0469208211143695,
+  "custom_instruction_counts": {
+    "xqmac8": 16,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 1.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 352.0
+  }
+}
+{
+  "variant": "micro-XR",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 25016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 4104,
+    "branch_jump": 10165,
+    "store": 394,
+    "multiply": 388,
+    "system": 12,
+    "load": 9946,
+    "custom_requant": 1
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 56,
+    "integer_ALU": 1170,
+    "store": 17,
+    "load": 50,
+    "multiply": 128,
+    "custom_requant": 1
+  },
+  "kernel_mnemonics": {
+    "bge": 4,
+    "c.addi16sp": 2,
+    "c.sdsp": 16,
+    "c.mv": 25,
+    "addiw": 259,
+    "srliw": 33,
+    "slli": 1,
+    "c.addi": 36,
+    "c.andi": 1,
+    "c.slli": 1,
+    "c.add": 2,
+    "c.li": 4,
+    "addi": 1,
+    "add": 3,
+    "lw": 1,
+    "c.j": 1,
+    "andi": 224,
+    "ld": 33,
+    "bne": 18,
+    "xori": 256,
+    "mulw": 128,
+    "srli": 160,
+    "addw": 130,
+    "c.srli": 32,
+    "beq": 32,
+    "c.ldsp": 16,
+    "xrequant8": 1,
+    "sb": 1,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 1422,
+    "text": 19962,
+    "finish": 4,
+    "number": 98
+  },
+  "operator_instret": {
+    "micro": 1433
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 1433,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.08932309839497557,
+  "kernel_memory_instructions": 67,
+  "kernel_load_store_per_MAC": 0.5234375,
+  "disassembled_text_bytes": 1956,
+  "custom_instruction_frequency": 0.0007032348804500703,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 1
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 1433.0
+  }
+}
+{
+  "variant": "micro-X2",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 20016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 3070,
+    "branch_jump": 8240,
+    "store": 391,
+    "multiply": 259,
+    "system": 12,
+    "load": 8021,
+    "custom_mac": 16,
+    "custom_requant": 1
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 56,
+    "integer_ALU": 152,
+    "store": 16,
+    "load": 49,
+    "custom_mac": 16,
+    "custom_requant": 1
+  },
+  "kernel_mnemonics": {
+    "bge": 4,
+    "c.addi16sp": 2,
+    "c.sdsp": 15,
+    "c.mv": 15,
+    "addiw": 2,
+    "srliw": 1,
+    "slli": 2,
+    "c.andi": 1,
+    "c.addi": 36,
+    "c.add": 2,
+    "c.li": 4,
+    "addi": 1,
+    "add": 3,
+    "lw": 1,
+    "c.j": 1,
+    "andi": 32,
+    "ld": 33,
+    "c.bnez": 16,
+    "c.slli": 16,
+    "srli": 16,
+    "xqmac8": 16,
+    "c.addiw": 17,
+    "beq": 16,
+    "c.beqz": 16,
+    "c.ldsp": 15,
+    "xrequant8": 1,
+    "sb": 1,
+    "bne": 2,
+    "addw": 2,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 290,
+    "text": 16114,
+    "finish": 4,
+    "number": 78
+  },
+  "operator_instret": {
+    "micro": 301
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 301,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.42524916943521596,
+  "kernel_memory_instructions": 65,
+  "kernel_load_store_per_MAC": 0.5078125,
+  "disassembled_text_bytes": 1664,
+  "custom_instruction_frequency": 0.05862068965517241,
+  "custom_instruction_counts": {
+    "xqmac8": 16,
+    "xrequant8": 1
+  },
+  "custom_MAC_coverage": 1.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 301.0
+  }
 }

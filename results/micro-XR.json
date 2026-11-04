@@ -1,0 +1,84 @@
+{
+  "variant": "micro-XR",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 25016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 4104,
+    "branch_jump": 10165,
+    "store": 394,
+    "multiply": 388,
+    "system": 12,
+    "load": 9946,
+    "custom_requant": 1
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 56,
+    "integer_ALU": 1170,
+    "store": 17,
+    "load": 50,
+    "multiply": 128,
+    "custom_requant": 1
+  },
+  "kernel_mnemonics": {
+    "bge": 4,
+    "c.addi16sp": 2,
+    "c.sdsp": 16,
+    "c.mv": 25,
+    "addiw": 259,
+    "srliw": 33,
+    "slli": 1,
+    "c.addi": 36,
+    "c.andi": 1,
+    "c.slli": 1,
+    "c.add": 2,
+    "c.li": 4,
+    "addi": 1,
+    "add": 3,
+    "lw": 1,
+    "c.j": 1,
+    "andi": 224,
+    "ld": 33,
+    "bne": 18,
+    "xori": 256,
+    "mulw": 128,
+    "srli": 160,
+    "addw": 130,
+    "c.srli": 32,
+    "beq": 32,
+    "c.ldsp": 16,
+    "xrequant8": 1,
+    "sb": 1,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 1422,
+    "text": 19962,
+    "finish": 4,
+    "number": 98
+  },
+  "operator_instret": {
+    "micro": 1433
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 1433,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.08932309839497557,
+  "kernel_memory_instructions": 67,
+  "kernel_load_store_per_MAC": 0.5234375,
+  "disassembled_text_bytes": 1956,
+  "custom_instruction_frequency": 0.0007032348804500703,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 1
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 1433.0
+  }
+}

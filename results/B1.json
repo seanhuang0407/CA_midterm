@@ -103,6 +103,18 @@
   "kernel_memory_instructions": 36871267,
   "kernel_load_store_per_MAC": 2.6151793354168937,
   "disassembled_text_bytes": 2198,
-  "custom_instruction_frequency": 0,
-  "functional_pass": true
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 207.07034350198413,
+    "depthwise": 217.9574785643424,
+    "project": 484.7564705569728,
+    "residual": 116.49485809948979,
+    "fc": 5589.56953125
+  }
 }

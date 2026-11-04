@@ -21,3 +21,8 @@
 `export_model.py` 使用 NumPy INT64 的獨立整數 reference，再逐元素比對 LiteRT BUILTIN_REF kernel。中間 tensor 可能被 runtime buffer alias 覆寫，因此對需要保護的 tensor 另標為 graph output 執行，確保比對的是該層真正輸出。所有選定層須為 0 mismatches；C 的 B0/B1 再與匯出 reference 比對。
 
 所選 block activation 只有 ReLU，可由 requant clamp 實現。全模型其他區塊的 HardSwish、SE pooling/multiply，以及一般 spatial Conv2D 的完整移植，尚未完成；目前完成的是題目允許的 dominant kernels／complete CNN block 路線。
+
+Prepared S/P/X1/XR/X2 共用離線 bias folding 與每 channel 64-bit requant descriptor。
+所選層的 shift 必須在 [-31,0]，export 時明確檢查。輸入／權重與中間 buffer
+以 8-byte 對齊，通用 kernel 另有未對齊 packing 與 scalar tail。原始 B0/B1
+的計算方式與預期指令數保留，便於追溯軟體與 ISA 各自的改善。

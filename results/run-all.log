@@ -148,22 +148,102 @@ project mismatches=0 checksum=1727378119
 residual mismatches=0 checksum=612828347
 fc mismatches=0 checksum=1427406882
 PASS
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -fPIC -shared src/kernels.c -o build/libkernels.so
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -fPIC -shared tests/quant_export.c -o build/libquant-opt.so
 python3 tests/test_quant.py
-..
+...
 ----------------------------------------------------------------------
-Ran 2 tests in 0.104s
+Ran 3 tests in 0.132s
 
 OK
-riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DOPT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld,-Map,build/B0.map src/start.S src/main.c src/kernels.c src/platform.c -lgcc -o build/B0.elf
+bash scripts/build_spike_custom.sh
+/home/sean/CA_midterm/tools/spike-v1.1.0.tar.gz: OK
+Custom Spike is up to date.
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/platform.c tests/isa_test.c tests/isa_alias.S tests/trap.S -lgcc -o build/isa-test.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/isa-test.elf has a LOAD segment with RWX permissions
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/platform.c tests/reject_test.c tests/trap.S -lgcc -o build/reject-test.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/reject-test.elf has a LOAD segment with RWX permissions
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=1 -DUSE_QMAC=1 -DUSE_REQUANT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/platform.c tests/kernel_test.c src/kernels_opt.c -lgcc -o build/kernel-test.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/kernel-test.elf has a LOAD segment with RWX permissions
+riscv-none-elf-gcc -march=rv32imc_zicsr -mabi=ilp32 -nostdlib -nostartfiles -Wl,-T,src/link.ld tests/rv32_reject.S -o build/rv32-reject.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/rv32-reject.elf has a LOAD segment with RWX permissions
+bash scripts/test_isa.sh
+Xqmac8 vectors=10216 Xrequant8 vectors=10576
+assertions=155800 expected_illegal_traps=13
+PASS
+Kernel tail/alignment comparisons=19008
+PASS
+Stock Spike rejected both custom instructions
+PASS
+RV32 rejected both RV64-only custom instructions: PASS
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DOPT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld -Wl,-Map,build/B0.map src/start.S src/main.c src/kernels.c src/platform.c -lgcc -o build/B0.elf
 /home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/B0.elf has a LOAD segment with RWX permissions
 riscv-none-elf-objdump -d -M no-aliases,numeric build/B0.elf > build/B0.dis
 riscv-none-elf-nm -n -S build/B0.elf > build/B0.symbols
 riscv-none-elf-size build/B0.elf > build/B0.size
-riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DOPT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld,-Map,build/B1.map src/start.S src/main.c src/kernels.c src/platform.c -lgcc -o build/B1.elf
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DOPT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld -Wl,-Map,build/B1.map src/start.S src/main.c src/kernels.c src/platform.c -lgcc -o build/B1.elf
 /home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/B1.elf has a LOAD segment with RWX permissions
 riscv-none-elf-objdump -d -M no-aliases,numeric build/B1.elf > build/B1.dis
 riscv-none-elf-nm -n -S build/B1.elf > build/B1.symbols
 riscv-none-elf-size build/B1.elf > build/B1.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPREPARED -DPACKED=0 -DUSE_QMAC=0 -DUSE_REQUANT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld -Wl,-Map,build/S.map src/start.S src/main.c src/kernels_opt.c src/platform.c -lgcc -o build/S.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/S.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/S.elf > build/S.dis
+riscv-none-elf-nm -n -S build/S.elf > build/S.symbols
+riscv-none-elf-size build/S.elf > build/S.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPREPARED -DPACKED=1 -DUSE_QMAC=0 -DUSE_REQUANT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld -Wl,-Map,build/P.map src/start.S src/main.c src/kernels_opt.c src/platform.c -lgcc -o build/P.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/P.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/P.elf > build/P.dis
+riscv-none-elf-nm -n -S build/P.elf > build/P.symbols
+riscv-none-elf-size build/P.elf > build/P.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPREPARED -DPACKED=1 -DUSE_QMAC=1 -DUSE_REQUANT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld -Wl,-Map,build/X1.map src/start.S src/main.c src/kernels_opt.c src/platform.c -lgcc -o build/X1.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/X1.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/X1.elf > build/X1.dis
+riscv-none-elf-nm -n -S build/X1.elf > build/X1.symbols
+riscv-none-elf-size build/X1.elf > build/X1.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPREPARED -DPACKED=1 -DUSE_QMAC=0 -DUSE_REQUANT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld -Wl,-Map,build/XR.map src/start.S src/main.c src/kernels_opt.c src/platform.c -lgcc -o build/XR.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/XR.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/XR.elf > build/XR.dis
+riscv-none-elf-nm -n -S build/XR.elf > build/XR.symbols
+riscv-none-elf-size build/XR.elf > build/XR.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPREPARED -DPACKED=1 -DUSE_QMAC=1 -DUSE_REQUANT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld -Wl,-Map,build/X2.map src/start.S src/main.c src/kernels_opt.c src/platform.c -lgcc -o build/X2.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/X2.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/X2.elf > build/X2.dis
+riscv-none-elf-nm -n -S build/X2.elf > build/X2.symbols
+riscv-none-elf-size build/X2.elf > build/X2.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DOPT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/micro.c src/kernels.c src/platform.c -lgcc -o build/micro.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/micro.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/micro.elf > build/micro.dis
+riscv-none-elf-nm -n -S build/micro.elf > build/micro.symbols
+riscv-none-elf-size build/micro.elf > build/micro.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=0 -DUSE_QMAC=0 -DUSE_REQUANT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/micro_prepared.c src/kernels_opt.c src/platform.c -lgcc -o build/micro-S.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/micro-S.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/micro-S.elf > build/micro-S.dis
+riscv-none-elf-nm -n -S build/micro-S.elf > build/micro-S.symbols
+riscv-none-elf-size build/micro-S.elf > build/micro-S.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=1 -DUSE_QMAC=0 -DUSE_REQUANT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/micro_prepared.c src/kernels_opt.c src/platform.c -lgcc -o build/micro-P.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/micro-P.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/micro-P.elf > build/micro-P.dis
+riscv-none-elf-nm -n -S build/micro-P.elf > build/micro-P.symbols
+riscv-none-elf-size build/micro-P.elf > build/micro-P.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=1 -DUSE_QMAC=1 -DUSE_REQUANT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/micro_prepared.c src/kernels_opt.c src/platform.c -lgcc -o build/micro-X1.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/micro-X1.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/micro-X1.elf > build/micro-X1.dis
+riscv-none-elf-nm -n -S build/micro-X1.elf > build/micro-X1.symbols
+riscv-none-elf-size build/micro-X1.elf > build/micro-X1.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=1 -DUSE_QMAC=0 -DUSE_REQUANT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/micro_prepared.c src/kernels_opt.c src/platform.c -lgcc -o build/micro-XR.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/micro-XR.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/micro-XR.elf > build/micro-XR.dis
+riscv-none-elf-nm -n -S build/micro-XR.elf > build/micro-XR.symbols
+riscv-none-elf-size build/micro-XR.elf > build/micro-XR.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DPACKED=1 -DUSE_QMAC=1 -DUSE_REQUANT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld src/start.S src/micro_prepared.c src/kernels_opt.c src/platform.c -lgcc -o build/micro-X2.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/micro-X2.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/micro-X2.elf > build/micro-X2.dis
+riscv-none-elf-nm -n -S build/micro-X2.elf > build/micro-X2.symbols
+riscv-none-elf-size build/micro-X2.elf > build/micro-X2.size
+bash scripts/build_spike_custom.sh
+/home/sean/CA_midterm/tools/spike-v1.1.0.tar.gz: OK
+Custom Spike is up to date.
 bash scripts/benchmark.sh
 {
   "variant": "B0",
@@ -269,8 +349,20 @@ bash scripts/benchmark.sh
   "kernel_memory_instructions": 36846169,
   "kernel_load_store_per_MAC": 2.6133992020962706,
   "disassembled_text_bytes": 2042,
-  "custom_instruction_frequency": 0,
-  "functional_pass": true
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 251.98697030895693,
+    "depthwise": 217.9574785643424,
+    "project": 637.5063509778912,
+    "residual": 116.49485809948979,
+    "fc": 7740.5578125
+  }
 }
 {
   "variant": "B1",
@@ -377,8 +469,614 @@ bash scripts/benchmark.sh
   "kernel_memory_instructions": 36871267,
   "kernel_load_store_per_MAC": 2.6151793354168937,
   "disassembled_text_bytes": 2198,
-  "custom_instruction_frequency": 0,
-  "functional_pass": true
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 207.07034350198413,
+    "depthwise": 217.9574785643424,
+    "project": 484.7564705569728,
+    "residual": 116.49485809948979,
+    "fc": 5589.56953125
+  }
+}
+{
+  "variant": "S",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 141345020,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 74493505,
+    "branch_jump": 16251587,
+    "store": 1767918,
+    "load": 33375532,
+    "multiply": 15456348,
+    "system": 124
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 15365851,
+    "integer_ALU": 68984530,
+    "store": 1691234,
+    "load": 32037502,
+    "multiply": 14852864
+  },
+  "kernel_mnemonics": {
+    "bge": 1921541,
+    "c.mv": 3192044,
+    "c.addi16sp": 8,
+    "c.sdsp": 1087842,
+    "slli": 6,
+    "addiw": 3015039,
+    "c.li": 1637036,
+    "c.add": 2187779,
+    "andi": 3696899,
+    "blt": 904420,
+    "srliw": 829187,
+    "lui": 1162215,
+    "c.addi": 8446981,
+    "addi": 2866393,
+    "xori": 5,
+    "c.ldsp": 2003550,
+    "add": 2929923,
+    "lw": 1130240,
+    "lb": 28300320,
+    "mulw": 14098944,
+    "addw": 17659770,
+    "bne": 6339065,
+    "ld": 528128,
+    "srli": 1810176,
+    "subw": 829184,
+    "and": 1658368,
+    "c.addiw": 5284922,
+    "c.beqz": 907008,
+    "c.srli": 302336,
+    "mul": 753920,
+    "srai": 829184,
+    "c.and": 302336,
+    "c.srai": 678656,
+    "beq": 5245568,
+    "sllw": 678656,
+    "sraw": 678656,
+    "slt": 1206784,
+    "sb": 603392,
+    "c.jr": 5,
+    "c.j": 48244,
+    "c.slli": 1,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.andi": 2032128,
+    "c.subw": 1984032,
+    "slliw": 150528,
+    "sll": 225792,
+    "c.lw": 75264
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 77492725,
+    "depthwise_prepared": 48477776,
+    "residual": 6961480,
+    "text": 264666,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 40835044,
+    "depthwise": 48477790,
+    "project": 30737021,
+    "residual": 6961493,
+    "fc": 5920713
+  },
+  "operator_share": {
+    "expand": 0.30718732330494747,
+    "depthwise": 0.3646809478113786,
+    "project": 0.23122353455424122,
+    "residual": 0.052368803640229424,
+    "fc": 0.04453939068920326
+  },
+  "ROI_retired": 132932061,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.10606127591747788,
+  "kernel_memory_instructions": 33728736,
+  "kernel_load_store_per_MAC": 2.3922881032792245,
+  "disassembled_text_bytes": 2542,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 180.85248370181407,
+    "depthwise": 214.7010965844671,
+    "project": 408.38941592261904,
+    "residual": 92.49432663690476,
+    "fc": 4625.55703125
+  }
+}
+{
+  "variant": "P",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 207410021,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 159861576,
+    "branch_jump": 18063856,
+    "store": 1767920,
+    "load": 12260190,
+    "multiply": 15456349,
+    "system": 124
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 17176533,
+    "integer_ALU": 154352585,
+    "store": 1691234,
+    "load": 10920574,
+    "multiply": 14852864
+  },
+  "kernel_mnemonics": {
+    "bge": 1921541,
+    "c.addi16sp": 8,
+    "c.sdsp": 1087842,
+    "c.mv": 3494374,
+    "addiw": 27148671,
+    "srliw": 3845891,
+    "slli": 6,
+    "c.addi": 5430277,
+    "lui": 1162215,
+    "c.andi": 2032131,
+    "addi": 2866396,
+    "c.add": 2187779,
+    "xori": 24133637,
+    "c.li": 427686,
+    "c.ldsp": 2003550,
+    "add": 2929923,
+    "lw": 1130240,
+    "c.j": 350577,
+    "andi": 24813824,
+    "ld": 3544832,
+    "bne": 4830713,
+    "mulw": 14098944,
+    "srli": 18704384,
+    "addw": 13433722,
+    "c.addw": 3016704,
+    "c.srli": 1508352,
+    "beq": 9169280,
+    "subw": 829184,
+    "and": 1960704,
+    "c.addiw": 5284922,
+    "mul": 753920,
+    "blt": 904417,
+    "srai": 829184,
+    "c.srai": 678656,
+    "sllw": 678656,
+    "sraw": 678656,
+    "slt": 1206784,
+    "sb": 603392,
+    "c.jr": 5,
+    "c.slli": 1,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "slliw": 150528,
+    "sll": 225792,
+    "c.lw": 75264
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 143554534,
+    "depthwise_prepared": 48477776,
+    "residual": 6961480,
+    "text": 267838,
+    "finish": 4,
+    "number": 2130
+  },
+  "operator_instret": {
+    "expand": 69962207,
+    "depthwise": 48477790,
+    "project": 60767352,
+    "residual": 6961493,
+    "fc": 12825028
+  },
+  "operator_share": {
+    "expand": 0.3515797094654222,
+    "depthwise": 0.24361448923024615,
+    "project": 0.3053729846050032,
+    "residual": 0.03498345451545819,
+    "fc": 0.06444936218387029
+  },
+  "ROI_retired": 198993870,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.07085114732428692,
+  "kernel_memory_instructions": 12611808,
+  "kernel_load_store_per_MAC": 0.8945214620329012,
+  "disassembled_text_bytes": 2832,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 309.8524615575397,
+    "depthwise": 214.7010965844671,
+    "project": 807.3893494897959,
+    "residual": 92.49432663690476,
+    "fc": 10019.553125
+  }
+}
+{
+  "variant": "X1",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 101195020,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 64810289,
+    "branch_jump": 18063568,
+    "store": 1465582,
+    "load": 11957567,
+    "multiply": 3389532,
+    "system": 124,
+    "custom_mac": 1508352
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 17176533,
+    "integer_ALU": 59301314,
+    "store": 1388898,
+    "load": 10618238,
+    "custom_mac": 1508352,
+    "multiply": 2786048
+  },
+  "kernel_mnemonics": {
+    "bge": 1921541,
+    "c.addi16sp": 8,
+    "c.sdsp": 785506,
+    "c.mv": 3469279,
+    "addiw": 3015036,
+    "srliw": 829187,
+    "slli": 3,
+    "andi": 6713603,
+    "lui": 1162215,
+    "c.slli": 1508356,
+    "c.addi": 5430277,
+    "addi": 2866396,
+    "c.addiw": 6793277,
+    "c.add": 1885443,
+    "xori": 5,
+    "c.li": 427686,
+    "c.ldsp": 1701214,
+    "add": 3232259,
+    "lw": 1130240,
+    "c.j": 350577,
+    "ld": 3544832,
+    "c.bnez": 1508352,
+    "srli": 3620864,
+    "xqmac8": 1508352,
+    "beq": 7660928,
+    "c.beqz": 1508352,
+    "subw": 829184,
+    "and": 1658368,
+    "mul": 753920,
+    "blt": 904417,
+    "srai": 829184,
+    "c.and": 302336,
+    "c.srai": 678656,
+    "sllw": 678656,
+    "sraw": 678656,
+    "slt": 1206784,
+    "addw": 4383610,
+    "sb": 603392,
+    "bne": 3322361,
+    "c.jr": 5,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.andi": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "mulw": 2032128,
+    "slliw": 150528,
+    "sll": 225792,
+    "c.lw": 75264
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 37340127,
+    "depthwise_prepared": 48477776,
+    "residual": 6961480,
+    "text": 267264,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 22081758,
+    "depthwise": 48477790,
+    "project": 13187959,
+    "residual": 6961493,
+    "fc": 2070463
+  },
+  "operator_share": {
+    "expand": 0.2380026493578649,
+    "depthwise": 0.5225056109669443,
+    "project": 0.14214308397107234,
+    "residual": 0.07503269338819088,
+    "fc": 0.02231596231592761
+  },
+  "ROI_retired": 92779463,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.15196190562129036,
+  "kernel_memory_instructions": 12007136,
+  "kernel_load_store_per_MAC": 0.8516337110070088,
+  "disassembled_text_bytes": 2552,
+  "custom_instruction_frequency": 0.01625740494523444,
+  "custom_instruction_counts": {
+    "xqmac8": 1508352,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.8558666521407561,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 97.79690157312925,
+    "depthwise": 214.7010965844671,
+    "project": 175.22266953656464,
+    "residual": 92.49432663690476,
+    "fc": 1617.54921875
+  }
+}
+{
+  "variant": "XR",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 186955021,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 141532297,
+    "branch_jump": 14555659,
+    "store": 2579391,
+    "load": 12831195,
+    "multiply": 14928221,
+    "system": 124,
+    "custom_requant": 528128
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 13670470,
+    "integer_ALU": 136023306,
+    "store": 2502705,
+    "load": 11493713,
+    "multiply": 14324736,
+    "custom_requant": 528128
+  },
+  "kernel_mnemonics": {
+    "bge": 1056263,
+    "c.addi16sp": 8,
+    "c.sdsp": 1899313,
+    "c.mv": 3343802,
+    "addiw": 26178368,
+    "srliw": 3317763,
+    "slli": 3,
+    "c.addi": 4902149,
+    "c.andi": 2032131,
+    "c.slli": 4,
+    "c.add": 829187,
+    "c.li": 427682,
+    "addi": 2863257,
+    "add": 2704131,
+    "lw": 1130240,
+    "c.j": 350432,
+    "andi": 21116928,
+    "ld": 3544832,
+    "bne": 4830713,
+    "xori": 24133633,
+    "mulw": 14098944,
+    "srli": 15083520,
+    "addw": 15394170,
+    "c.srli": 3016704,
+    "beq": 5024640,
+    "c.ldsp": 2576689,
+    "xrequant8": 528128,
+    "sb": 603392,
+    "c.jr": 5,
+    "c.lui": 2,
+    "c.addiw": 3691129,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.beqz": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "lui": 338335,
+    "subw": 301056,
+    "slliw": 150528,
+    "sll": 225792,
+    "mul": 225792,
+    "blt": 376289,
+    "srai": 301056,
+    "and": 376320,
+    "c.lw": 75264,
+    "c.srai": 150528,
+    "sllw": 150528,
+    "sraw": 150528,
+    "slt": 150528
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 132266287,
+    "depthwise_prepared": 39315291,
+    "residual": 6961480,
+    "text": 263570,
+    "finish": 4,
+    "number": 2130
+  },
+  "operator_instret": {
+    "expand": 61475079,
+    "depthwise": 39315305,
+    "project": 58012933,
+    "residual": 6961493,
+    "fc": 12778328
+  },
+  "operator_share": {
+    "expand": 0.3443149912599833,
+    "depthwise": 0.22020059376350828,
+    "project": 0.324923901583941,
+    "residual": 0.03899053796175578,
+    "fc": 0.07156997543081157
+  },
+  "ROI_retired": 178543138,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.07896659685683356,
+  "kernel_memory_instructions": 13996418,
+  "kernel_load_store_per_MAC": 0.9927281078639648,
+  "disassembled_text_bytes": 2468,
+  "custom_instruction_frequency": 0.0029579867507366206,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 528128
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 272.26420333758506,
+    "depthwise": 174.12178022250566,
+    "project": 770.7925834396259,
+    "residual": 92.49432663690476,
+    "fc": 9983.06875
+  }
+}
+{
+  "variant": "X2",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 80720021,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 46455915,
+    "branch_jump": 14557919,
+    "store": 2277053,
+    "load": 12531120,
+    "multiply": 2861404,
+    "system": 124,
+    "custom_mac": 1508352,
+    "custom_requant": 528128
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 13670470,
+    "integer_ALU": 40946940,
+    "store": 2200369,
+    "load": 11191377,
+    "custom_mac": 1508352,
+    "custom_requant": 528128,
+    "multiply": 2257920
+  },
+  "kernel_mnemonics": {
+    "bge": 1056263,
+    "c.addi16sp": 8,
+    "c.sdsp": 1596977,
+    "c.mv": 3293612,
+    "addiw": 2038463,
+    "srliw": 301059,
+    "slli": 6,
+    "c.andi": 2032131,
+    "c.addi": 4902149,
+    "c.add": 829187,
+    "c.li": 427682,
+    "addi": 2863257,
+    "add": 2704131,
+    "lw": 1130240,
+    "c.j": 350432,
+    "andi": 3016704,
+    "ld": 3544832,
+    "c.bnez": 1508352,
+    "c.slli": 1508353,
+    "srli": 1508352,
+    "xqmac8": 1508352,
+    "c.addiw": 5205754,
+    "beq": 3516288,
+    "c.beqz": 3540480,
+    "c.ldsp": 2274353,
+    "xrequant8": 528128,
+    "sb": 603392,
+    "bne": 3322361,
+    "addw": 3327354,
+    "c.jr": 5,
+    "c.lui": 2,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "lb": 4166688,
+    "c.subw": 1984032,
+    "mulw": 2032128,
+    "lui": 338335,
+    "xori": 1,
+    "subw": 301056,
+    "slliw": 150528,
+    "sll": 225792,
+    "mul": 225792,
+    "blt": 376289,
+    "srai": 301056,
+    "and": 376320,
+    "c.lw": 75264,
+    "c.srai": 150528,
+    "sllw": 150528,
+    "sraw": 150528,
+    "slt": 150528
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 272,
+    "pointwise_prepared": 26026785,
+    "depthwise_prepared": 39315291,
+    "residual": 6961480,
+    "text": 268092,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 13582085,
+    "depthwise": 39315305,
+    "project": 10420995,
+    "residual": 6961493,
+    "fc": 2023758
+  },
+  "operator_share": {
+    "expand": 0.1878478836112751,
+    "depthwise": 0.5437528065670169,
+    "project": 0.14412822890400698,
+    "residual": 0.0962813682011787,
+    "fc": 0.027989712716522307
+  },
+  "ROI_retired": 72303636,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.19499633462416746,
+  "kernel_memory_instructions": 13391746,
+  "kernel_load_store_per_MAC": 0.9498403568380724,
+  "disassembled_text_bytes": 2176,
+  "custom_instruction_frequency": 0.0281656963040656,
+  "custom_instruction_counts": {
+    "xqmac8": 1508352,
+    "xrequant8": 528128
+  },
+  "custom_MAC_coverage": 0.8558666521407561,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "expand": 60.15308336876417,
+    "depthwise": 174.12178022250566,
+    "project": 138.45922353316325,
+    "residual": 92.49432663690476,
+    "fc": 1581.0609375
+  }
 }
 {
   "variant": "micro",
@@ -462,51 +1160,579 @@ bash scripts/benchmark.sh
   "kernel_memory_instructions": 318,
   "kernel_load_store_per_MAC": 2.484375,
   "disassembled_text_bytes": 1450,
-  "custom_instruction_frequency": 0,
-  "functional_pass": true
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 1182.0
+  }
 }
-# 實測結果
+{
+  "variant": "micro-S",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 20017,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 3203,
+    "branch_jump": 7998,
+    "store": 395,
+    "multiply": 388,
+    "system": 12,
+    "load": 8015
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 48,
+    "integer_ALU": 285,
+    "store": 20,
+    "load": 277,
+    "multiply": 129
+  },
+  "kernel_mnemonics": {
+    "bge": 6,
+    "c.mv": 20,
+    "c.addi16sp": 2,
+    "c.sdsp": 19,
+    "slli": 2,
+    "addiw": 4,
+    "c.li": 11,
+    "c.add": 5,
+    "andi": 8,
+    "blt": 2,
+    "srliw": 2,
+    "lui": 3,
+    "c.addi": 69,
+    "addi": 1,
+    "xori": 1,
+    "c.ldsp": 19,
+    "add": 3,
+    "lw": 1,
+    "lb": 256,
+    "mulw": 128,
+    "addw": 136,
+    "bne": 34,
+    "ld": 1,
+    "srli": 3,
+    "subw": 1,
+    "and": 2,
+    "c.addiw": 4,
+    "c.beqz": 3,
+    "c.srli": 1,
+    "mul": 1,
+    "srai": 1,
+    "c.and": 1,
+    "c.srai": 1,
+    "beq": 1,
+    "sllw": 1,
+    "sraw": 1,
+    "slt": 2,
+    "sb": 1,
+    "c.jr": 1,
+    "c.j": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 759,
+    "text": 15646,
+    "finish": 4,
+    "number": 78
+  },
+  "operator_instret": {
+    "micro": 770
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 770,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.16623376623376623,
+  "kernel_memory_instructions": 297,
+  "kernel_load_store_per_MAC": 2.3203125,
+  "disassembled_text_bytes": 2030,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 770.0
+  }
+}
+{
+  "variant": "micro-P",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 25016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 4137,
+    "branch_jump": 10149,
+    "store": 397,
+    "multiply": 389,
+    "system": 12,
+    "load": 9926
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 63,
+    "integer_ALU": 1203,
+    "store": 20,
+    "load": 53,
+    "multiply": 129
+  },
+  "kernel_mnemonics": {
+    "bge": 6,
+    "c.addi16sp": 2,
+    "c.sdsp": 19,
+    "c.mv": 19,
+    "addiw": 260,
+    "srliw": 34,
+    "slli": 2,
+    "c.addi": 37,
+    "lui": 3,
+    "c.andi": 1,
+    "addi": 2,
+    "c.add": 5,
+    "xori": 257,
+    "c.li": 5,
+    "c.ldsp": 19,
+    "add": 3,
+    "lw": 1,
+    "c.j": 1,
+    "andi": 231,
+    "ld": 33,
+    "bne": 18,
+    "mulw": 128,
+    "srli": 180,
+    "addw": 100,
+    "c.addw": 32,
+    "c.srli": 16,
+    "beq": 36,
+    "subw": 1,
+    "and": 3,
+    "c.addiw": 4,
+    "mul": 1,
+    "blt": 1,
+    "srai": 1,
+    "c.srai": 1,
+    "sllw": 1,
+    "sraw": 1,
+    "slt": 2,
+    "sb": 1,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 1468,
+    "text": 19916,
+    "finish": 4,
+    "number": 98
+  },
+  "operator_instret": {
+    "micro": 1479
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 1479,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.08654496281271129,
+  "kernel_memory_instructions": 73,
+  "kernel_load_store_per_MAC": 0.5703125,
+  "disassembled_text_bytes": 2320,
+  "custom_instruction_frequency": 0.0,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 1479.0
+  }
+}
+{
+  "variant": "micro-X1",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 20017,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 3108,
+    "branch_jump": 8222,
+    "store": 394,
+    "multiply": 260,
+    "system": 12,
+    "load": 7999,
+    "custom_mac": 16
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 63,
+    "integer_ALU": 190,
+    "store": 19,
+    "load": 52,
+    "custom_mac": 16,
+    "multiply": 1
+  },
+  "kernel_mnemonics": {
+    "bge": 6,
+    "c.addi16sp": 2,
+    "c.sdsp": 18,
+    "c.mv": 14,
+    "addiw": 3,
+    "srliw": 2,
+    "slli": 1,
+    "andi": 40,
+    "lui": 3,
+    "c.slli": 17,
+    "c.addi": 37,
+    "addi": 2,
+    "c.addiw": 21,
+    "c.add": 4,
+    "xori": 1,
+    "c.li": 5,
+    "c.ldsp": 18,
+    "add": 4,
+    "lw": 1,
+    "c.j": 1,
+    "ld": 33,
+    "c.bnez": 16,
+    "srli": 20,
+    "xqmac8": 16,
+    "beq": 20,
+    "c.beqz": 16,
+    "subw": 1,
+    "and": 2,
+    "mul": 1,
+    "blt": 1,
+    "srai": 1,
+    "c.and": 1,
+    "c.srai": 1,
+    "sllw": 1,
+    "sraw": 1,
+    "slt": 2,
+    "addw": 4,
+    "sb": 1,
+    "bne": 2,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 341,
+    "text": 16064,
+    "finish": 4,
+    "number": 78
+  },
+  "operator_instret": {
+    "micro": 352
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 352,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.36363636363636365,
+  "kernel_memory_instructions": 71,
+  "kernel_load_store_per_MAC": 0.5546875,
+  "disassembled_text_bytes": 2040,
+  "custom_instruction_frequency": 0.0469208211143695,
+  "custom_instruction_counts": {
+    "xqmac8": 16,
+    "xrequant8": 0
+  },
+  "custom_MAC_coverage": 1.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 352.0
+  }
+}
+{
+  "variant": "micro-XR",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 25016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 4104,
+    "branch_jump": 10165,
+    "store": 394,
+    "multiply": 388,
+    "system": 12,
+    "load": 9946,
+    "custom_requant": 1
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 56,
+    "integer_ALU": 1170,
+    "store": 17,
+    "load": 50,
+    "multiply": 128,
+    "custom_requant": 1
+  },
+  "kernel_mnemonics": {
+    "bge": 4,
+    "c.addi16sp": 2,
+    "c.sdsp": 16,
+    "c.mv": 25,
+    "addiw": 259,
+    "srliw": 33,
+    "slli": 1,
+    "c.addi": 36,
+    "c.andi": 1,
+    "c.slli": 1,
+    "c.add": 2,
+    "c.li": 4,
+    "addi": 1,
+    "add": 3,
+    "lw": 1,
+    "c.j": 1,
+    "andi": 224,
+    "ld": 33,
+    "bne": 18,
+    "xori": 256,
+    "mulw": 128,
+    "srli": 160,
+    "addw": 130,
+    "c.srli": 32,
+    "beq": 32,
+    "c.ldsp": 16,
+    "xrequant8": 1,
+    "sb": 1,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 1422,
+    "text": 19962,
+    "finish": 4,
+    "number": 98
+  },
+  "operator_instret": {
+    "micro": 1433
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 1433,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.08932309839497557,
+  "kernel_memory_instructions": 67,
+  "kernel_load_store_per_MAC": 0.5234375,
+  "disassembled_text_bytes": 1956,
+  "custom_instruction_frequency": 0.0007032348804500703,
+  "custom_instruction_counts": {
+    "xqmac8": 0,
+    "xrequant8": 1
+  },
+  "custom_MAC_coverage": 0.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 1433.0
+  }
+}
+{
+  "variant": "micro-X2",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 20016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 3070,
+    "branch_jump": 8240,
+    "store": 391,
+    "multiply": 259,
+    "system": 12,
+    "load": 8021,
+    "custom_mac": 16,
+    "custom_requant": 1
+  },
+  "kernel_instruction_mix": {
+    "branch_jump": 56,
+    "integer_ALU": 152,
+    "store": 16,
+    "load": 49,
+    "custom_mac": 16,
+    "custom_requant": 1
+  },
+  "kernel_mnemonics": {
+    "bge": 4,
+    "c.addi16sp": 2,
+    "c.sdsp": 15,
+    "c.mv": 15,
+    "addiw": 2,
+    "srliw": 1,
+    "slli": 2,
+    "c.andi": 1,
+    "c.addi": 36,
+    "c.add": 2,
+    "c.li": 4,
+    "addi": 1,
+    "add": 3,
+    "lw": 1,
+    "c.j": 1,
+    "andi": 32,
+    "ld": 33,
+    "c.bnez": 16,
+    "c.slli": 16,
+    "srli": 16,
+    "xqmac8": 16,
+    "c.addiw": 17,
+    "beq": 16,
+    "c.beqz": 16,
+    "c.ldsp": 15,
+    "xrequant8": 1,
+    "sb": 1,
+    "bne": 2,
+    "addw": 2,
+    "c.jr": 1
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3382,
+    "pointwise_prepared": 290,
+    "text": 16114,
+    "finish": 4,
+    "number": 78
+  },
+  "operator_instret": {
+    "micro": 301
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 301,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.42524916943521596,
+  "kernel_memory_instructions": 65,
+  "kernel_load_store_per_MAC": 0.5078125,
+  "disassembled_text_bytes": 1664,
+  "custom_instruction_frequency": 0.05862068965517241,
+  "custom_instruction_counts": {
+    "xqmac8": 16,
+    "xrequant8": 1
+  },
+  "custom_MAC_coverage": 1.0,
+  "functional_pass": true,
+  "operator_instructions_per_output": {
+    "micro": 301.0
+  }
+}
+# ISA 實測結果
 
-固定 seed=2026；Spike v1.1.0；GCC 15.2.0；RV64IMC + privileged CSR；數字為退休指令，非硬體 cycles。
+固定 seed=2026；GCC 15.2.0；原版／修改版 Spike v1.1.0。全部數字為 retired instructions，不是 cycles、CPI、PPA 或完整模型 speedup。
 
-| 算子 | MACs | B0 指令數 | B1 指令數 | 指令減少 |
-|---|---:|---:|---:|---:|
-| expand | 5,419,008 | 56,896,642 | 46,754,827 | 17.82% |
-| depthwise | 2,032,128 | 49,213,055 | 49,213,055 | 0.00% |
-| project | 5,419,008 | 47,981,278 | 36,484,711 | 23.96% |
-| residual | 0 | 8,767,869 | 8,767,869 | 0.00% |
-| fc | 1,228,800 | 9,907,914 | 7,154,649 | 27.79% |
-| 合計 | 14,098,944 | 172,766,758 | 148,375,111 | 14.12% |
+## 比較組
 
-B0/B1 指令數比為 1.1644×。這不是 cycle speedup 或完整模型加速比。
+| 版本 | 行為 | ROI retired |
+|---|---|---:|
+| B0 | 原始 scalar、noinline requant | 172,766,758 |
+| B1 | 四路 scalar unroll | 148,375,111 |
+| S | folded bias、四路 scalar unroll、inline requant | 132,932,061 |
+| P | S 的 packed ld + 八路 scalar unpack/MAC 控制組 | 198,993,870 |
+| X1 | P + Xqmac8 | 92,779,463 |
+| XR | P + Xrequant8（消融） | 178,543,138 |
+| X2 | P + Xqmac8 + Xrequant8 | 72,303,636 |
 
-| 指標 | B0 | B1 |
+## 各算子退休指令
+
+| 算子 | MACs | B0 | B1 | S | P | X1 | XR | X2 |
+|---|---:|---:|---:|---:|---:|---:|---:|---:|
+| expand | 5,419,008 | 56,896,642 | 46,754,827 | 40,835,044 | 69,962,207 | 22,081,758 | 61,475,079 | 13,582,085 |
+| depthwise | 2,032,128 | 49,213,055 | 49,213,055 | 48,477,790 | 48,477,790 | 48,477,790 | 39,315,305 | 39,315,305 |
+| project | 5,419,008 | 47,981,278 | 36,484,711 | 30,737,021 | 60,767,352 | 13,187,959 | 58,012,933 | 10,420,995 |
+| residual | 0 | 8,767,869 | 8,767,869 | 6,961,493 | 6,961,493 | 6,961,493 | 6,961,493 | 6,961,493 |
+| fc | 1,228,800 | 9,907,914 | 7,154,649 | 5,920,713 | 12,825,028 | 2,070,463 | 12,778,328 | 2,023,758 |
+| 合計 | 14,098,944 | 172,766,758 | 148,375,111 | 132,932,061 | 198,993,870 | 92,779,463 | 178,543,138 | 72,303,636 |
+
+## 增量收益與消融
+
+| 比較 | 指令數比（前/後） | 指令減少 |
 |---|---:|---:|
-| whole_program_retired | 181180021 | 156790020 |
-| ROI_retired | 172766758 | 148375111 |
-| ROI_MAC_per_instruction | 0.08160681003228643 | 0.09502229791086728 |
-| kernel_memory_instructions | 36846169 | 36871267 |
-| kernel_load_store_per_MAC | 2.6133992020962706 | 2.6151793354168937 |
-| disassembled_text_bytes | 2042 | 2198 |
+| B0 → X2 | 2.3895× | 58.15% |
+| B1 → X2 | 2.0521× | 51.27% |
+| S → X1 | 1.4328× | 30.21% |
+| S → X2 | 1.8385× | 45.61% |
+| P → X1 | 2.1448× | 53.38% |
+| P → XR | 1.1145× | 10.28% |
+| X1 → X2 | 1.2832× | 22.07% |
+| XR → X2 | 2.4694× | 59.50% |
+
+P 將 packed registers 在軟體拆成 8 lanes，指令成本高於 S。P→X1／XR 只用來控制資料布局；實際收益必須同時看較快的純軟體 S，不能只挑較慢的 P 當 baseline。S 已內聯 requant，避免將原始 noinline 呼叫開銷當成 ISA 的全部收益。
+
+## 相對最快純軟體的 major GEMM/FC 改善
+
+| 算子 | 最快純軟體 | 純軟體 instructions | X2 instructions | 指令數比 |
+|---|---|---:|---:|---:|
+| expand | S | 40,835,044 | 13,582,085 | 3.0065× |
+| project | S | 30,737,021 | 10,420,995 | 2.9495× |
+| fc | S | 5,920,713 | 2,023,758 | 2.9256× |
+
+因此達成題目「major GEMM/FC kernel ≥2× dynamic instruction reduction」目標。未宣稱完整模型推論或 cycle speedup。
+
+## ISA-level metrics
+
+| 指標 | B0 | B1 | S | P | X1 | XR | X2 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| ROI_MAC_per_instruction | 0.081607 | 0.095022 | 0.106061 | 0.070851 | 0.151962 | 0.078967 | 0.194996 |
+| kernel_memory_instructions | 36846169 | 36871267 | 33728736 | 12611808 | 12007136 | 13996418 | 13391746 |
+| kernel_load_store_per_MAC | 2.613399 | 2.615179 | 2.392288 | 0.894521 | 0.851634 | 0.992728 | 0.94984 |
+| disassembled_text_bytes | 2042 | 2198 | 2542 | 2832 | 2552 | 2468 | 2176 |
+| custom_instruction_frequency | 0.0 | 0.0 | 0.0 | 0.0 | 0.016257 | 0.002958 | 0.028166 |
+| xqmac8 count | 0 | 0 | 0 | 0 | 1,508,352 | 0 | 1,508,352 |
+| xrequant8 count | 0 | 0 | 0 | 0 | 0 | 528,128 | 528,128 |
+
+custom_instruction_frequency 的分母為 kernel histogram 指令數。MAC/instruction 的分母為 ROI，兩者範圍略有差異。Custom MAC coverage = 8×Xqmac8_count / logical_MAC_count。
 
 ## Kernel 指令組成
 
-| 類別 | B0 | B1 |
+| 類別 | B0 | B1 | S | P | X1 | XR | X2 |
+|---|---:|---:|---:|---:|---:|---:|---:|
+| load | 34,407,194 | 34,426,013 | 32,037,502 | 10,920,574 | 10,618,238 | 11,493,713 | 11,191,377 |
+| store | 2,438,975 | 2,445,254 | 1,691,234 | 1,691,234 | 1,388,898 | 2,502,705 | 2,200,369 |
+| integer_ALU | 95,295,774 | 79,626,799 | 68,984,530 | 154,352,585 | 59,301,314 | 136,023,306 | 40,946,940 |
+| multiply | 14,852,864 | 14,852,864 | 14,852,864 | 14,852,864 | 2,786,048 | 14,324,736 | 2,257,920 |
+| branch_jump | 25,771,844 | 17,024,074 | 15,365,851 | 17,176,533 | 17,176,533 | 13,670,470 | 13,670,470 |
+| custom_mac | 0 | 0 | 0 | 0 | 1,508,352 | 0 | 1,508,352 |
+| custom_requant | 0 | 0 | 0 | 0 | 0 | 528,128 | 528,128 |
+| floating_point | 0 | 0 | 0 | 0 | 0 | 0 | 0 |
+
+## Requant 增量：每個輸出元素的指令數
+
+此數包含整個算子，X1→X2 的變化是加上 requant 指令後的增量，不是單獨 requant latency。
+
+| 算子 | X1 instructions/output | X2 instructions/output |
 |---|---:|---:|
-| load | 34,407,194 | 34,426,013 |
-| store | 2,438,975 | 2,445,254 |
-| integer_ALU | 95,295,774 | 79,626,799 |
-| multiply | 14,852,864 | 14,852,864 |
-| branch_jump | 25,771,844 | 17,024,074 |
-| divide_remainder | 0 | 0 |
-| system | 0 | 0 |
-| floating_point | 0 | 0 |
+| expand | 97.7969 | 60.1531 |
+| depthwise | 214.7011 | 174.1218 |
+| project | 175.2227 | 138.4592 |
+| fc | 1617.5492 | 1581.0609 |
 
-Microbenchmark：128 MAC，1,182 retired instructions，PASS。
+## Microbenchmark：128 MAC
 
-資料範圍：ROI 為各算子呼叫前後 minstret 差值，含少量呼叫／取樣開銷。Kernel histogram 為 pointwise、depthwise、residual、requant、qmul 函式內的精確 PC 計數，不含驗證／列印。兩者範圍略有差異，不能混用分母。Whole-program 包含啟動、比對、列印及 reset ROM，其中 6 條 reset ROM 指令不在 ELF 反組譯內。
+| 版本 | ROI retired |
+|---|---:|
+| micro | 1,182 |
+| micro-S | 770 |
+| micro-P | 1,479 |
+| micro-X1 | 352 |
+| micro-XR | 1,433 |
+| micro-X2 | 301 |
 
-Code size 使用反組譯 .text 指令長度總和；build/*.size 的 text 同時含 rodata（模型權重與測試 reference），兩者不可混稱。
+## 下一個瓶頸
 
-固定 seed 與工具版本才應得到上述指令數；其他輸入可能改變 rounding、clamp、padding 分支數。
+X2 的 depthwise 占 ROI 54.38%，residual ADD 占 9.63%。Xqmac8 目前只用在連續 K 維度的 pointwise/FC，depthwise 保留 scalar MAC 與邊界／索引計算。下一步應先分離 interior/border、改善 loop layout，再量測是否值得加 gather 或 memory ISA。
+
+Memory 指令減少只證明 load/store 指令開銷下降；沒有 cache-miss 或 bandwidth 測量，不能推論硬體 cache bottleneck 已解決。
+
+## 量測範圍與資料成本
+
+ROI 是算子呼叫前後的 minstret 差值，含少量參數準備／取樣開銷。Kernel histogram 僅計 pointwise/depthwise（含 prepared 版本）、residual、qmul、requant；不含驗證與列印。Whole-program JSON 含啟動、比對、列印，以及 ELF 外的 6 條 reset ROM 指令。
+
+Code size 是反組譯 .text 指令長度總和。build/*.size 的 text 也包含 rodata，不可混稱。Prepared 版本使用離線 folded bias 與每 channel 8-byte descriptor；其輸出 header、load 成本及 ELF data/rodata 都保留，沒有把 descriptor decode/loading 當作免費。
+
+評估範圍為完整 residual block（12,870,144 MAC）加一個 FC（1,228,800 MAC）。全部版本使用相同輸入並逐元素對照獨立 reference；未執行整個模型的 bare-metal inference。
 

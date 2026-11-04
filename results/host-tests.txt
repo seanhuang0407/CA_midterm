@@ -24,9 +24,11 @@ project mismatches=0 checksum=1727378119
 residual mismatches=0 checksum=612828347
 fc mismatches=0 checksum=1427406882
 PASS
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -fPIC -shared src/kernels.c -o build/libkernels.so
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -fPIC -shared tests/quant_export.c -o build/libquant-opt.so
 python3 tests/test_quant.py
-..
+...
 ----------------------------------------------------------------------
-Ran 2 tests in 0.092s
+Ran 3 tests in 0.132s
 
 OK

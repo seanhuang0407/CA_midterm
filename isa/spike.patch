@@ -1,0 +1,29 @@
+--- a/riscv/encoding.h
++++ b/riscv/encoding.h
+@@ -4630,3 +4630,15 @@
+ DECLARE_CAUSE("virtual instruction", CAUSE_VIRTUAL_INSTRUCTION)
+ DECLARE_CAUSE("store guest page fault", CAUSE_STORE_GUEST_PAGE_FAULT)
+ #endif
++
++// CA midterm project-local custom-0 instructions.
++#ifndef MATCH_XQMAC8
++#define MATCH_XQMAC8 0x0000000b
++#define MASK_XQMAC8 0xfe00707f
++#define MATCH_XREQUANT8 0x0000100b
++#define MASK_XREQUANT8 0xfe00707f
++#endif
++#ifdef DECLARE_INSN
++DECLARE_INSN(xqmac8, MATCH_XQMAC8, MASK_XQMAC8)
++DECLARE_INSN(xrequant8, MATCH_XREQUANT8, MASK_XREQUANT8)
++#endif
+--- a/disasm/disasm.cc
++++ b/disasm/disasm.cc
+@@ -624,6 +624,8 @@
+ 
+ disassembler_t::disassembler_t(int xlen)
+ {
++  add_rtype_insn(this, "xqmac8", MATCH_XQMAC8, MASK_XQMAC8);
++  add_rtype_insn(this, "xrequant8", MATCH_XREQUANT8, MASK_XREQUANT8);
+   const uint32_t mask_rd = 0x1fUL << 7;
+   const uint32_t match_rd_ra = 1UL << 7;
+   const uint32_t mask_rs1 = 0x1fUL << 15;

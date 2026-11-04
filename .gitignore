@@ -2,3 +2,4 @@
 /build/
 /models/*.tflite
 **/__pycache__/
+/results/build-*.log

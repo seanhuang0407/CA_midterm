@@ -100,9 +100,22 @@ def main():
         f.write('#pragma once\n#include <stdint.h>\n')
         for name,v in arrays.items():
             typ='int8_t' if v.dtype==np.int8 else 'int32_t';flat=v.reshape(-1)
-            f.write('static const %s %s[%d] = {\n'%(typ,name,len(flat)))
+            f.write('static const %s %s[%d] __attribute__((aligned(8))) = {\n'%(typ,name,len(flat)))
             for i in range(0,len(flat),32):f.write(','.join(str(int(z)) for z in flat[i:i+32])+',\n')
             f.write('};\n')
+        f.write('#ifdef PREPARED\n')
+        for name in ['expand','project','fc']:
+            w=arrays[name+'_w'].reshape(len(arrays[name+'_b']),-1).astype(np.int64)
+            folded=arrays[name+'_b'].astype(np.int64)-params[name]['input_zero']*w.sum(axis=1)
+            assert np.all((folded>=-(1<<31)) & (folded<(1<<31)))
+            f.write('static const int32_t %s_folded_b[%d] = {'%(name,len(folded))+','.join(map(str,folded))+'};\n')
+        for name in ['expand','depthwise','project','fc']:
+            p=params[name];desc=[]
+            for q,shift in zip(arrays[name+'_mult'],arrays[name+'_shift']):
+                assert 0<=int(q)<(1<<31) and -31<=int(shift)<=0
+                desc.append(int(q)|((int(shift)&63)<<32)|((p['output_zero']&255)<<38)|((p['min']&255)<<46)|(127<<54))
+            f.write('static const uint64_t %s_desc[%d] = {'%(name,len(desc))+','.join('UINT64_C(%d)'%v for v in desc)+'};\n')
+        f.write('#endif\n')
         for name,p in params.items():
             if isinstance(p,dict):
                 for k,v in p.items():f.write('#define P_%s_%s (%d)\n'%(name,k,v))
