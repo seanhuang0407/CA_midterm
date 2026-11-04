@@ -1,0 +1,128 @@
+tools/gcc.tar.gz: OK
+tools/spike-v1.1.0.tar.gz: OK
+tools/device-tree-compiler_1.5.1-1_amd64.deb: OK
+tools/libfdt1_1.5.1-1_amd64.deb: OK
+models/mobilenet_v3_large_int8_channelwise.tflite: OK
+{
+  "source": "https://huggingface.co/litert-community/MobileNet-v3-large",
+  "revision": "9a4fd87358f71befb4de2f5ecdce1a159486b1f2",
+  "sha256": "13993dec4dcfdf95d6f671b40e907b6fd6f04897577d23f4f407418fbf73bf48",
+  "seed": 2026,
+  "model_mac_count": 216589760,
+  "weight_elements": 5451272,
+  "operator_counts": {
+    "DEQUANTIZE": 1,
+    "TRANSPOSE": 1,
+    "PAD": 5,
+    "CONV_2D": 47,
+    "HARD_SWISH": 21,
+    "DEPTHWISE_CONV_2D": 15,
+    "QUANTIZE": 2,
+    "ADD": 18,
+    "AVERAGE_POOL_2D": 9,
+    "MUL": 16,
+    "FULLY_CONNECTED": 2
+  },
+  "float_boundary_ops": [
+    {
+      "index": 0,
+      "op": "DEQUANTIZE"
+    },
+    {
+      "index": 1,
+      "op": "TRANSPOSE"
+    },
+    {
+      "index": 2,
+      "op": "PAD"
+    },
+    {
+      "index": 3,
+      "op": "CONV_2D"
+    },
+    {
+      "index": 4,
+      "op": "HARD_SWISH"
+    },
+    {
+      "index": 5,
+      "op": "DEPTHWISE_CONV_2D"
+    },
+    {
+      "index": 6,
+      "op": "QUANTIZE"
+    },
+    {
+      "index": 8,
+      "op": "QUANTIZE"
+    }
+  ],
+  "scope": "actual pretrained integer residual block ops 14-17 and first FC; not full-model bare-metal inference",
+  "parameters": {
+    "input_zero": 11,
+    "expand": {
+      "input_zero": 11,
+      "output_zero": -128,
+      "min": -128
+    },
+    "depthwise": {
+      "input_zero": -128,
+      "output_zero": -128,
+      "min": -128
+    },
+    "project": {
+      "input_zero": -128,
+      "output_zero": 6,
+      "min": -128
+    },
+    "add": {
+      "a_zero": 6,
+      "b_zero": 11,
+      "out_zero": 4,
+      "aq": 1073741824,
+      "as": 0,
+      "bq": 1463899715,
+      "bs": -1,
+      "oq": 2030644827,
+      "os": -19
+    },
+    "fc": {
+      "input_zero": -125,
+      "output_zero": 54,
+      "min": -128,
+      "k": 960,
+      "n": 1280
+    }
+  },
+  "verification": [
+    {
+      "name": "expand",
+      "macs": 5419008,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "depthwise",
+      "macs": 2032128,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "project",
+      "macs": 5419008,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "residual",
+      "macs": 0,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "fc",
+      "macs": 1228800,
+      "litert_mismatches": 0
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+numpy==1.24.4
+flatbuffers==24.3.25
+tflite==2.18.0
+tflite-runtime==2.14.0

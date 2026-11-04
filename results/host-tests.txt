@@ -1,0 +1,32 @@
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -DHOST -DOPT=0 src/main.c src/kernels.c src/platform.c -o build/host-B0
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -DHOST -DOPT=1 src/main.c src/kernels.c src/platform.c -o build/host-B1
+./build/host-B0
+ROI expand instret=0
+ROI depthwise instret=0
+ROI project instret=0
+ROI residual instret=0
+ROI fc instret=0
+expand mismatches=0 checksum=2998823028
+depthwise mismatches=0 checksum=4184350541
+project mismatches=0 checksum=1727378119
+residual mismatches=0 checksum=612828347
+fc mismatches=0 checksum=1427406882
+PASS
+./build/host-B1
+ROI expand instret=0
+ROI depthwise instret=0
+ROI project instret=0
+ROI residual instret=0
+ROI fc instret=0
+expand mismatches=0 checksum=2998823028
+depthwise mismatches=0 checksum=4184350541
+project mismatches=0 checksum=1727378119
+residual mismatches=0 checksum=612828347
+fc mismatches=0 checksum=1427406882
+PASS
+python3 tests/test_quant.py
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.092s
+
+OK

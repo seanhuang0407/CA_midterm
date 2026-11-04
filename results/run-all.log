@@ -1,0 +1,512 @@
+python3 scripts/export_model.py
+{
+  "source": "https://huggingface.co/litert-community/MobileNet-v3-large",
+  "revision": "9a4fd87358f71befb4de2f5ecdce1a159486b1f2",
+  "sha256": "13993dec4dcfdf95d6f671b40e907b6fd6f04897577d23f4f407418fbf73bf48",
+  "seed": 2026,
+  "model_mac_count": 216589760,
+  "weight_elements": 5451272,
+  "operator_counts": {
+    "DEQUANTIZE": 1,
+    "TRANSPOSE": 1,
+    "PAD": 5,
+    "CONV_2D": 47,
+    "HARD_SWISH": 21,
+    "DEPTHWISE_CONV_2D": 15,
+    "QUANTIZE": 2,
+    "ADD": 18,
+    "AVERAGE_POOL_2D": 9,
+    "MUL": 16,
+    "FULLY_CONNECTED": 2
+  },
+  "float_boundary_ops": [
+    {
+      "index": 0,
+      "op": "DEQUANTIZE"
+    },
+    {
+      "index": 1,
+      "op": "TRANSPOSE"
+    },
+    {
+      "index": 2,
+      "op": "PAD"
+    },
+    {
+      "index": 3,
+      "op": "CONV_2D"
+    },
+    {
+      "index": 4,
+      "op": "HARD_SWISH"
+    },
+    {
+      "index": 5,
+      "op": "DEPTHWISE_CONV_2D"
+    },
+    {
+      "index": 6,
+      "op": "QUANTIZE"
+    },
+    {
+      "index": 8,
+      "op": "QUANTIZE"
+    }
+  ],
+  "scope": "actual pretrained integer residual block ops 14-17 and first FC; not full-model bare-metal inference",
+  "parameters": {
+    "input_zero": 11,
+    "expand": {
+      "input_zero": 11,
+      "output_zero": -128,
+      "min": -128
+    },
+    "depthwise": {
+      "input_zero": -128,
+      "output_zero": -128,
+      "min": -128
+    },
+    "project": {
+      "input_zero": -128,
+      "output_zero": 6,
+      "min": -128
+    },
+    "add": {
+      "a_zero": 6,
+      "b_zero": 11,
+      "out_zero": 4,
+      "aq": 1073741824,
+      "as": 0,
+      "bq": 1463899715,
+      "bs": -1,
+      "oq": 2030644827,
+      "os": -19
+    },
+    "fc": {
+      "input_zero": -125,
+      "output_zero": 54,
+      "min": -128,
+      "k": 960,
+      "n": 1280
+    }
+  },
+  "verification": [
+    {
+      "name": "expand",
+      "macs": 5419008,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "depthwise",
+      "macs": 2032128,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "project",
+      "macs": 5419008,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "residual",
+      "macs": 0,
+      "litert_mismatches": 0,
+      "litert_max_abs_difference": 0
+    },
+    {
+      "name": "fc",
+      "macs": 1228800,
+      "litert_mismatches": 0
+    }
+  ]
+}
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -DHOST -DOPT=0 src/main.c src/kernels.c src/platform.c -o build/host-B0
+gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -DHOST -DOPT=1 src/main.c src/kernels.c src/platform.c -o build/host-B1
+./build/host-B0
+ROI expand instret=0
+ROI depthwise instret=0
+ROI project instret=0
+ROI residual instret=0
+ROI fc instret=0
+expand mismatches=0 checksum=2998823028
+depthwise mismatches=0 checksum=4184350541
+project mismatches=0 checksum=1727378119
+residual mismatches=0 checksum=612828347
+fc mismatches=0 checksum=1427406882
+PASS
+./build/host-B1
+ROI expand instret=0
+ROI depthwise instret=0
+ROI project instret=0
+ROI residual instret=0
+ROI fc instret=0
+expand mismatches=0 checksum=2998823028
+depthwise mismatches=0 checksum=4184350541
+project mismatches=0 checksum=1727378119
+residual mismatches=0 checksum=612828347
+fc mismatches=0 checksum=1427406882
+PASS
+python3 tests/test_quant.py
+..
+----------------------------------------------------------------------
+Ran 2 tests in 0.104s
+
+OK
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DOPT=0 -nostdlib -nostartfiles -Wl,-T,src/link.ld,-Map,build/B0.map src/start.S src/main.c src/kernels.c src/platform.c -lgcc -o build/B0.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/B0.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/B0.elf > build/B0.dis
+riscv-none-elf-nm -n -S build/B0.elf > build/B0.symbols
+riscv-none-elf-size build/B0.elf > build/B0.size
+riscv-none-elf-gcc -std=c11 -O2 -Wall -Wextra -Werror -fno-tree-vectorize -fno-tree-slp-vectorize -fno-builtin -Isrc -Ibuild -march=rv64imc_zicsr -mabi=lp64 -mcmodel=medany -msmall-data-limit=0 -ffreestanding -fno-stack-protector -DOPT=1 -nostdlib -nostartfiles -Wl,-T,src/link.ld,-Map,build/B1.map src/start.S src/main.c src/kernels.c src/platform.c -lgcc -o build/B1.elf
+/home/sean/CA_midterm/tools/xpack-riscv-none-elf-gcc-15.2.0-1/bin/../lib/gcc/riscv-none-elf/15.2.0/../../../../riscv-none-elf/bin/ld: warning: build/B1.elf has a LOAD segment with RWX permissions
+riscv-none-elf-objdump -d -M no-aliases,numeric build/B1.elf > build/B1.dis
+riscv-none-elf-nm -n -S build/B1.elf > build/B1.symbols
+riscv-none-elf-size build/B1.elf > build/B1.size
+bash scripts/benchmark.sh
+{
+  "variant": "B0",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 181180021,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 100804763,
+    "branch_jump": 26657732,
+    "store": 2515672,
+    "load": 35745376,
+    "multiply": 15456348,
+    "system": 124
+  },
+  "kernel_instruction_mix": {
+    "integer_ALU": 95295774,
+    "branch_jump": 25771844,
+    "multiply": 14852864,
+    "store": 2438975,
+    "load": 34407194
+  },
+  "kernel_mnemonics": {
+    "c.mv": 2927253,
+    "bge": 1659655,
+    "c.li": 1640678,
+    "sll": 753920,
+    "mul": 753920,
+    "lui": 1162210,
+    "c.addi": 27678720,
+    "blt": 1920223,
+    "c.add": 1736771,
+    "srai": 753920,
+    "c.slli": 753921,
+    "c.srli": 753920,
+    "c.srai": 753920,
+    "c.addiw": 4825786,
+    "c.jr": 1357317,
+    "subw": 14729560,
+    "sllw": 678656,
+    "srliw": 1357312,
+    "c.and": 678656,
+    "c.addw": 16069057,
+    "sraw": 678656,
+    "slt": 678656,
+    "c.sdsp": 1835582,
+    "jal": 1357312,
+    "c.ldsp": 3841965,
+    "slliw": 753770,
+    "sraiw": 603242,
+    "c.addi16sp": 603402,
+    "addi": 3426248,
+    "c.lwsp": 3149,
+    "slli": 3,
+    "add": 3076741,
+    "lw": 1584384,
+    "lb": 28300320,
+    "mulw": 14098944,
+    "bne": 15389177,
+    "sb": 603392,
+    "addw": 1287041,
+    "c.lui": 2,
+    "c.swsp": 1,
+    "addiw": 2041593,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.andi": 2032128,
+    "c.beqz": 2032128,
+    "beq": 2007936,
+    "c.j": 48096,
+    "c.lw": 677376,
+    "c.subw": 150528
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 299,
+    "qmul": 20614882,
+    "requant": 9271954,
+    "pointwise": 101528891,
+    "depthwise": 39318770,
+    "residual": 2032154,
+    "text": 264970,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 56896642,
+    "depthwise": 49213055,
+    "project": 47981278,
+    "residual": 8767869,
+    "fc": 9907914
+  },
+  "operator_share": {
+    "expand": 0.32932632792704253,
+    "depthwise": 0.28485256984448365,
+    "project": 0.27772285916252476,
+    "residual": 0.050749745503703904,
+    "fc": 0.057348497562245165
+  },
+  "ROI_retired": 172766758,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.08160681003228643,
+  "kernel_memory_instructions": 36846169,
+  "kernel_load_store_per_MAC": 2.6133992020962706,
+  "disassembled_text_bytes": 2042,
+  "custom_instruction_frequency": 0,
+  "functional_pass": true
+}
+{
+  "variant": "B1",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 156790020,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 85135788,
+    "branch_jump": 17910785,
+    "store": 2521951,
+    "load": 35765018,
+    "multiply": 15456348,
+    "system": 124
+  },
+  "kernel_instruction_mix": {
+    "integer_ALU": 79626799,
+    "branch_jump": 17024074,
+    "multiply": 14852864,
+    "store": 2445254,
+    "load": 34426013
+  },
+  "kernel_mnemonics": {
+    "c.mv": 3544462,
+    "bge": 1961991,
+    "c.li": 2843758,
+    "sll": 753920,
+    "mul": 753920,
+    "lui": 1162210,
+    "c.addi": 9578499,
+    "blt": 1920226,
+    "c.add": 2039107,
+    "srai": 753920,
+    "c.slli": 753921,
+    "c.srli": 753920,
+    "c.srai": 753920,
+    "c.addiw": 4825786,
+    "c.jr": 1357317,
+    "subw": 5679448,
+    "sllw": 678656,
+    "srliw": 1357315,
+    "c.and": 678656,
+    "c.addw": 4002241,
+    "sraw": 678656,
+    "slt": 678656,
+    "c.sdsp": 1841861,
+    "jal": 1357312,
+    "c.ldsp": 3860784,
+    "slliw": 753770,
+    "sraiw": 603242,
+    "c.addi16sp": 603402,
+    "addi": 3426248,
+    "c.lwsp": 3149,
+    "addiw": 2041599,
+    "slli": 6,
+    "andi": 3,
+    "add": 2478339,
+    "lw": 1584384,
+    "lb": 28300320,
+    "c.subw": 9200640,
+    "mulw": 14098944,
+    "addw": 14260865,
+    "bne": 6339065,
+    "sb": 603392,
+    "c.j": 48099,
+    "c.lui": 2,
+    "c.swsp": 1,
+    "sltiu": 677376,
+    "sra": 2032128,
+    "c.andi": 2032128,
+    "c.beqz": 2032128,
+    "beq": 2007936,
+    "c.lw": 677376
+  },
+  "function_retired": {
+    "unknown": 301730,
+    "check": 7844251,
+    "main": 299,
+    "qmul": 20614882,
+    "requant": 9271954,
+    "pointwise": 77137244,
+    "depthwise": 39318770,
+    "residual": 2032154,
+    "text": 266616,
+    "finish": 4,
+    "number": 2110
+  },
+  "operator_instret": {
+    "expand": 46754827,
+    "depthwise": 49213055,
+    "project": 36484711,
+    "residual": 8767869,
+    "fc": 7154649
+  },
+  "operator_share": {
+    "expand": 0.3151123303961673,
+    "depthwise": 0.3316799877575155,
+    "project": 0.24589508815936117,
+    "residual": 0.05909258595264,
+    "fc": 0.048220007734316034
+  },
+  "ROI_retired": 148375111,
+  "ROI_MACs": 14098944,
+  "ROI_MAC_per_instruction": 0.09502229791086728,
+  "kernel_memory_instructions": 36871267,
+  "kernel_load_store_per_MAC": 2.6151793354168937,
+  "disassembled_text_bytes": 2198,
+  "custom_instruction_frequency": 0,
+  "functional_pass": true
+}
+{
+  "variant": "micro",
+  "measurement": "Spike exact retired PC histogram; CSR minstret operator intervals",
+  "whole_program_retired": 20016,
+  "unknown_pc_retired": 6,
+  "whole_program_instruction_mix": {
+    "integer_ALU": 3123,
+    "branch_jump": 8071,
+    "store": 410,
+    "multiply": 389,
+    "system": 12,
+    "load": 8005
+  },
+  "kernel_instruction_mix": {
+    "integer_ALU": 574,
+    "branch_jump": 143,
+    "multiply": 129,
+    "store": 28,
+    "load": 290
+  },
+  "kernel_mnemonics": {
+    "c.mv": 12,
+    "bge": 5,
+    "c.li": 6,
+    "sll": 1,
+    "mul": 1,
+    "lui": 2,
+    "c.addi": 262,
+    "blt": 3,
+    "c.add": 3,
+    "srai": 1,
+    "c.slli": 1,
+    "c.srli": 1,
+    "c.srai": 1,
+    "c.addiw": 3,
+    "subw": 129,
+    "sllw": 1,
+    "srliw": 2,
+    "c.and": 1,
+    "c.addw": 132,
+    "sraw": 1,
+    "slt": 1,
+    "c.jr": 3,
+    "c.sdsp": 27,
+    "jal": 2,
+    "c.ldsp": 27,
+    "addi": 1,
+    "slliw": 1,
+    "sraiw": 1,
+    "c.addi16sp": 3,
+    "c.lwsp": 4,
+    "slli": 1,
+    "add": 5,
+    "lw": 3,
+    "lb": 256,
+    "mulw": 128,
+    "bne": 130,
+    "sb": 1,
+    "addw": 2
+  },
+  "function_retired": {
+    "unknown": 142,
+    "main": 3002,
+    "qmul": 29,
+    "requant": 16,
+    "pointwise": 1119,
+    "text": 15600,
+    "finish": 4,
+    "number": 98
+  },
+  "operator_instret": {
+    "micro": 1182
+  },
+  "operator_share": {
+    "micro": 1.0
+  },
+  "ROI_retired": 1182,
+  "ROI_MACs": 128,
+  "ROI_MAC_per_instruction": 0.10829103214890017,
+  "kernel_memory_instructions": 318,
+  "kernel_load_store_per_MAC": 2.484375,
+  "disassembled_text_bytes": 1450,
+  "custom_instruction_frequency": 0,
+  "functional_pass": true
+}
+# 實測結果
+
+固定 seed=2026；Spike v1.1.0；GCC 15.2.0；RV64IMC + privileged CSR；數字為退休指令，非硬體 cycles。
+
+| 算子 | MACs | B0 指令數 | B1 指令數 | 指令減少 |
+|---|---:|---:|---:|---:|
+| expand | 5,419,008 | 56,896,642 | 46,754,827 | 17.82% |
+| depthwise | 2,032,128 | 49,213,055 | 49,213,055 | 0.00% |
+| project | 5,419,008 | 47,981,278 | 36,484,711 | 23.96% |
+| residual | 0 | 8,767,869 | 8,767,869 | 0.00% |
+| fc | 1,228,800 | 9,907,914 | 7,154,649 | 27.79% |
+| 合計 | 14,098,944 | 172,766,758 | 148,375,111 | 14.12% |
+
+B0/B1 指令數比為 1.1644×。這不是 cycle speedup 或完整模型加速比。
+
+| 指標 | B0 | B1 |
+|---|---:|---:|
+| whole_program_retired | 181180021 | 156790020 |
+| ROI_retired | 172766758 | 148375111 |
+| ROI_MAC_per_instruction | 0.08160681003228643 | 0.09502229791086728 |
+| kernel_memory_instructions | 36846169 | 36871267 |
+| kernel_load_store_per_MAC | 2.6133992020962706 | 2.6151793354168937 |
+| disassembled_text_bytes | 2042 | 2198 |
+
+## Kernel 指令組成
+
+| 類別 | B0 | B1 |
+|---|---:|---:|
+| load | 34,407,194 | 34,426,013 |
+| store | 2,438,975 | 2,445,254 |
+| integer_ALU | 95,295,774 | 79,626,799 |
+| multiply | 14,852,864 | 14,852,864 |
+| branch_jump | 25,771,844 | 17,024,074 |
+| divide_remainder | 0 | 0 |
+| system | 0 | 0 |
+| floating_point | 0 | 0 |
+
+Microbenchmark：128 MAC，1,182 retired instructions，PASS。
+
+資料範圍：ROI 為各算子呼叫前後 minstret 差值，含少量呼叫／取樣開銷。Kernel histogram 為 pointwise、depthwise、residual、requant、qmul 函式內的精確 PC 計數，不含驗證／列印。兩者範圍略有差異，不能混用分母。Whole-program 包含啟動、比對、列印及 reset ROM，其中 6 條 reset ROM 指令不在 ELF 反組譯內。
+
+Code size 使用反組譯 .text 指令長度總和；build/*.size 的 text 同時含 rodata（模型權重與測試 reference），兩者不可混稱。
+
+固定 seed 與工具版本才應得到上述指令數；其他輸入可能改變 rounding、clamp、padding 分支數。
+

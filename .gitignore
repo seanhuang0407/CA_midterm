@@ -1,0 +1,4 @@
+/tools/
+/build/
+/models/*.tflite
+**/__pycache__/
